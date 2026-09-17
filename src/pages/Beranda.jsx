@@ -58,7 +58,7 @@ function Beranda() {
           <img
             src={maskotKora}
             alt="Maskot KoRa, Duta Rupiah Flobamora, melambaikan tangan"
-            className="relative h-[360px] w-auto object-contain drop-shadow-2xl"
+            className="mascot-float relative h-[360px] w-auto object-contain drop-shadow-2xl"
           />
         </div>
       </section>
