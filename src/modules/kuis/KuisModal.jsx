@@ -1,3 +1,4 @@
+import { ArrowRight, CircleCheck, CircleX } from 'lucide-react'
 import { useState } from 'react'
 import AnswerCard from '../../components/AnswerCard'
 import Modal from '../../components/Modal'
@@ -45,7 +46,7 @@ function KuisModal({ isOpen, onClose }) {
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} titleId={TITLE_ID} panelClassName="panel-glow-neutral">
-      <h2 id={TITLE_ID} className="mb-1 text-2xl font-bold text-white">
+      <h2 id={TITLE_ID} className="mb-1 text-[26px] font-bold text-white">
         Kuis CBP Rupiah
       </h2>
       <p className="mb-6 text-sm text-[var(--color-ink-on-bg-muted)]">
@@ -57,11 +58,11 @@ function KuisModal({ isOpen, onClose }) {
           <p className="text-3xl font-bold text-white">
             Skor: {state.correctCount}/{TOTAL} · {percent}% paham
           </p>
-          <p className="max-w-sm text-[var(--color-ink-on-bg)]">{getKuisMessage(percent)}</p>
+          <p className="max-w-sm text-[var(--color-ink-on-bg-muted)]">{getKuisMessage(percent)}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              className="btn-primary"
+              className="btn-primary-sage"
               onClick={() => {
                 setState(createInitialState())
                 setSelesai(false)
@@ -76,16 +77,16 @@ function KuisModal({ isOpen, onClose }) {
         </div>
       ) : (
         <div className="flex flex-col gap-5" data-testid="kuis-content">
-          <ProgressDots total={TOTAL} current={state.index} />
-
-          <div>
-            <p className="text-xs uppercase tracking-wide text-[var(--color-ink-on-bg-muted)]">
-              Soal {state.index + 1} dari {TOTAL}
-            </p>
-            <p className="mt-1 text-lg font-semibold text-white">{soal.soal}</p>
-          </div>
+          <ProgressDots total={TOTAL} current={state.index} accent="sage" variant="flat" />
 
           <div className="flex flex-col gap-3">
+            <p className="text-xs font-semibold tracking-wide text-[var(--color-sage)] uppercase">
+              Soal {state.index + 1} dari {TOTAL}
+            </p>
+            <p className="text-xl leading-snug font-bold text-white">{soal.soal}</p>
+          </div>
+
+          <div className="flex flex-col gap-2.5">
             {soal.opsi.map((opsi, index) => (
               <AnswerCard
                 key={index}
@@ -99,11 +100,24 @@ function KuisModal({ isOpen, onClose }) {
           </div>
 
           {isAnswered && (
-            <div className="feedback-box" data-correct={state.selected === soal.benar}>
-              <p className="font-semibold">{state.selected === soal.benar ? 'Tepat!' : 'Belum tepat.'}</p>
-              <p className="mt-1">{soal.penjelasan}</p>
-              <button type="button" className="btn-primary mt-4" onClick={handleNext}>
-                {state.index === TOTAL - 1 ? 'Lihat skor' : 'Lanjut'}
+            <div className="callout-slot flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                {state.selected === soal.benar ? (
+                  <CircleCheck size={16} className="text-[var(--color-sage)]" aria-hidden="true" />
+                ) : (
+                  <CircleX size={16} className="text-[var(--color-danger)]" aria-hidden="true" />
+                )}
+                <p
+                  className="text-sm font-bold"
+                  style={{ color: state.selected === soal.benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
+                >
+                  {state.selected === soal.benar ? 'Tepat!' : 'Belum tepat'}
+                </p>
+              </div>
+              <p className="text-[13px] leading-relaxed text-[var(--color-ink-on-bg-muted)]">{soal.penjelasan}</p>
+              <button type="button" className="btn-primary-sage w-fit self-end !px-6 !py-3" onClick={handleNext}>
+                {state.index === TOTAL - 1 ? 'Lihat skor' : 'Soal Berikutnya'}
+                <ArrowRight size={16} aria-hidden="true" />
               </button>
             </div>
           )}

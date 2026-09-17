@@ -1,35 +1,35 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap");
-@import "@heroui/react/styles";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
 
 @theme {
   --font-display: "Space Grotesk", sans-serif;
   --font-body: "Plus Jakarta Sans", sans-serif;
 
   --color-bg: #15335f;
+  --color-bg-deep: #0e2038;
   --color-surface: #ffffff;
   --color-ink: #1c2333;
-  --color-ink-muted: #5b5f55;
+  --color-ink-muted: #5b6472;
   --color-ink-on-bg: #eef1fa;
   --color-ink-on-bg-muted: rgb(255 255 255 / 72%);
   --color-border-on-bg: rgb(255 255 255 / 28%);
 
-  --color-indigo: #1f2a44;
-  --color-indigo-dark: #141c30;
-  --color-indigo-tint: #e4e7ee;
-  --color-indigo-glow: #7c93ff;
+  --color-indigo: #7c93ff;
+  --color-indigo-light: #93a6ff;
 
-  --color-ochre: #c98a2c;
+  --color-ochre: #e7b15c;
+  --color-ochre-light: #f2c97d;
   --color-ochre-dark: #9c6a1e;
+  --color-ochre-text: #2a1b04;
 
-  --color-rust: #8c3b2e;
-  --color-rust-tint: #f4e3de;
-  --color-rust-glow: #ff7a59;
+  --color-rust: #ff7a59;
+  --color-rust-light: #ff9b7f;
 
-  --color-sage: #4b6350;
-  --color-sage-tint: #e4ebe0;
-  --color-sage-glow: #5ce0b0;
+  --color-sage: #5ce0b0;
+  --color-sage-light: #8ce8be;
+  --color-sage-text: #0a2b1c;
 
-  --color-danger-glow: #ff6b6b;
+  --color-danger: #ff6b6b;
 
   --radius-panel: 28px;
   --radius-panel-sm: 22px;
@@ -40,9 +40,6 @@
     background-color: var(--color-bg);
     color: var(--color-ink-on-bg);
     font-family: var(--font-body);
-    background-image:
-      linear-gradient(135deg, transparent 45%, rgb(217 169 74 / 6%) 45%, rgb(217 169 74 / 6%) 55%, transparent 55%);
-    background-size: 64px 64px;
   }
 
   h1,
@@ -63,6 +60,19 @@
     @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-[var(--color-ochre)] focus:px-4 focus:py-2 focus:text-white;
   }
 
+  /* Full-bleed page background: deep-to-bg gradient, subtle tenun ikat
+     diamond motif, fading to solid before the next section. Approximates
+     the .pen file's GLSL "tenun-motif-ntt" shader layer with a tiled SVG. */
+  .textured-bg {
+    background-color: var(--color-bg-deep);
+    background-image:
+      linear-gradient(to bottom, transparent 0%, var(--color-bg-deep) 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23E7B15C' stroke-opacity='0.10' stroke-width='1'%3E%3Cpath d='M48 0 96 48 48 96 0 48Z'/%3E%3Cpath d='M48 20 76 48 48 76 20 48Z'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(to bottom, var(--color-bg-deep), var(--color-bg));
+    background-repeat: no-repeat, repeat, no-repeat;
+    background-size: 100% 100%, 96px 96px, 100% 100%;
+  }
+
   .panel-glow {
     border-radius: var(--radius-panel);
     box-shadow:
@@ -78,66 +88,131 @@
   }
 
   .panel-glow-indigo {
-    background: radial-gradient(120% 160% at 50% -20%, #232b4d 0%, #0d0f1a 55%, #060710 100%);
+    background: radial-gradient(140% 180% at 50% -20%, #232b4d 0%, #0d0f1a 55%, #060710 100%);
   }
 
   .panel-glow-rust {
-    background: radial-gradient(120% 160% at 50% -20%, #3a2436 0%, #180f14 55%, #0a0608 100%);
+    background: radial-gradient(140% 180% at 50% -20%, #3a2436 0%, #180f14 55%, #0a0608 100%);
   }
 
   .panel-glow-neutral {
-    background: radial-gradient(120% 160% at 50% -20%, #1c2a3a 0%, #0d141c 55%, #060a0f 100%);
+    background: radial-gradient(140% 180% at 50% -20%, #1c2a3a 0%, #0d141c 55%, #060a0f 100%);
   }
 
+  /* Buttons — pill CTAs with a per-context accent gradient, matching the
+     "Button/Primary" component: ochre by default for marketing CTAs,
+     module-accent overrides (indigo/rust/sage) for in-flow "Lanjut" actions. */
+  .btn-primary,
+  .btn-primary-indigo,
+  .btn-primary-rust,
+  .btn-primary-sage,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-primary {
+    color: var(--color-ochre-text);
+    background: linear-gradient(180deg, var(--color-ochre-light), var(--color-ochre));
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+
+  .btn-primary-indigo {
+    @apply text-white;
+    background: linear-gradient(180deg, var(--color-indigo-light), var(--color-indigo));
+  }
+
+  .btn-primary-rust {
+    @apply text-white;
+    background: linear-gradient(180deg, var(--color-rust-light), var(--color-rust));
+  }
+
+  .btn-primary-sage {
+    color: var(--color-sage-text);
+    background: linear-gradient(180deg, var(--color-sage-light), var(--color-sage));
+  }
+
+  .btn-ghost {
+    @apply border border-white/30 bg-transparent text-[var(--color-ink-on-bg)] shadow-none hover:bg-white/10;
+  }
+
+  .back-link {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-medium text-[var(--color-ink-on-bg-muted)] transition hover:-translate-x-1 hover:text-white;
+  }
+
+  .pill-badge {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-1.5 text-xs font-medium text-[var(--color-ink-on-bg-muted)];
+  }
+
+  .icon-chip {
+    @apply flex shrink-0 items-center justify-center rounded-xl border;
+  }
+
+  /* Kalkulator wizard option cards: bordered glass card + custom
+     radio/checkbox indicator, indigo accent when selected. */
   .option-card {
-    @apply relative flex w-full cursor-pointer items-start gap-3 rounded-xl border border-white/15 bg-white/[0.03] px-4 py-3 text-left text-sm text-[var(--color-ink-on-bg)] transition;
+    @apply relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border border-white/30 bg-white/[0.03] px-5 py-[18px] text-left text-sm text-[var(--color-ink-on-bg)] transition;
   }
 
   .option-card:hover {
-    @apply -translate-y-0.5 border-white/30 bg-white/[0.06];
+    @apply border-white/50 bg-white/[0.06];
   }
 
   .option-card[data-selected="true"] {
-    border-color: var(--color-indigo-glow);
-    box-shadow: 0 0 0 1px var(--color-indigo-glow), 0 8px 20px -8px var(--color-indigo-glow);
-    background: rgb(124 147 255 / 12%);
+    border-color: var(--color-indigo);
+    border-width: 1.5px;
+    background: rgb(124 147 255 / 10%);
   }
 
-  .option-card[data-disabled="true"] {
-    @apply pointer-events-none opacity-40;
+  .option-indicator {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-white/30;
   }
 
-  .option-card[data-correct="true"] {
-    border-color: var(--color-sage-glow);
-    box-shadow: 0 0 0 1px var(--color-sage-glow), 0 8px 20px -8px var(--color-sage-glow);
-    background: rgb(92 224 176 / 12%);
-    opacity: 1 !important;
-    pointer-events: none;
+  .option-indicator[data-shape="square"] {
+    @apply rounded-md;
   }
 
-  .option-card[data-incorrect="true"] {
-    border-color: var(--color-danger-glow);
-    box-shadow: 0 0 0 1px var(--color-danger-glow), 0 8px 20px -8px var(--color-danger-glow);
-    background: rgb(255 107 107 / 12%);
-    opacity: 1 !important;
-    pointer-events: none;
+  .option-indicator[data-checked="true"] {
+    border-color: var(--color-indigo);
   }
 
-  .feedback-box {
-    @apply rounded-xl border px-4 py-3 text-sm leading-relaxed;
-    animation: feedback-in 0.35s ease-out;
+  .option-dot {
+    @apply h-2.5 w-2.5 rounded-full;
+    background: var(--color-indigo);
   }
 
-  .feedback-box[data-correct="true"] {
-    border-color: var(--color-sage-glow);
+  /* Answer cards (Keamanan scenario / Kuis quiz): locked state shows a
+     check/x state icon and tints, unrelated options dim to 45% opacity. */
+  .answer-card {
+    @apply relative flex w-full items-center gap-3 rounded-2xl border border-white/30 bg-white/[0.03] px-[18px] py-3.5 text-left text-sm font-medium text-[var(--color-ink-on-bg)] transition;
+  }
+
+  .answer-card:hover:not(:disabled) {
+    @apply border-white/50 bg-white/[0.06];
+  }
+
+  .answer-card[data-correct="true"] {
+    border-color: var(--color-sage);
+    border-width: 1.5px;
     background: rgb(92 224 176 / 10%);
-    color: #d7fff0;
   }
 
-  .feedback-box[data-correct="false"] {
-    border-color: var(--color-danger-glow);
+  .answer-card[data-incorrect="true"] {
+    border-color: var(--color-danger);
+    border-width: 1.5px;
     background: rgb(255 107 107 / 10%);
-    color: #ffe3e3;
+  }
+
+  .answer-card[data-disabled="true"] {
+    @apply pointer-events-none opacity-45;
+  }
+
+  /* Solid, high-contrast callout used for feedback and recommendation
+     messages inside a colored gradient panel. */
+  .callout-slot {
+    @apply rounded-2xl bg-black px-6 py-5;
   }
 
   .progress-dot {
@@ -145,57 +220,47 @@
   }
 
   .progress-dot[data-state="current"] {
-    @apply w-6 bg-white;
+    @apply w-3.5 bg-white ring-2;
+    ring-color: var(--dot-accent, var(--color-ochre));
   }
 
   .progress-dot[data-state="done"] {
-    background-color: var(--color-ochre);
+    background-color: var(--dot-accent, var(--color-ochre));
   }
 
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[var(--color-indigo-glow)] to-[#4c5fd6] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40;
+  .progress-dot-flat {
+    @apply h-2 w-2 rounded-full;
+    background-color: rgb(255 255 255 / 19%);
   }
 
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-transparent px-6 py-3 text-sm font-semibold text-[var(--color-ink-on-bg)] transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40;
+  .progress-dot-flat[data-state="current"] {
+    background-color: white;
   }
 
-  .back-link {
-    @apply inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm text-[var(--color-ink-on-bg-muted)] transition hover:-translate-x-1 hover:text-white;
-  }
-}
-
-@keyframes feedback-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .progress-dot-flat[data-state="done"] {
+    background-color: var(--dot-accent, var(--color-ochre));
   }
 }
 
 @keyframes onboarding-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(201 138 44 / 55%);
+    box-shadow: 0 0 0 0 rgb(231 177 92 / 55%);
   }
 
   50% {
-    box-shadow: 0 0 0 12px rgb(201 138 44 / 0%);
+    box-shadow: 0 0 0 12px rgb(231 177 92 / 0%);
   }
 }
 
 @keyframes coin-float {
   0%,
   100% {
-    transform: translateY(0) rotate(-4deg);
+    transform: translateY(0) rotate(var(--coin-rotate, -8deg));
   }
 
   50% {
-    transform: translateY(-8px) rotate(4deg);
+    transform: translateY(-10px) rotate(calc(var(--coin-rotate, -8deg) * -1));
   }
 }
 

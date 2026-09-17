@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import OptionCard from '../../components/OptionCard'
 import ProgressDots from '../../components/ProgressDots'
@@ -57,20 +58,20 @@ function KalkulatorWizard({ onComplete }) {
   }
 
   return (
-    <div className="panel-glow panel-glow-indigo mx-auto flex w-full max-w-[720px] flex-col gap-6 p-6 sm:p-10" data-testid="kalkulator-wizard">
-      <ProgressDots total={STEPS.length} current={stepIndex} />
+    <div className="panel-glow panel-glow-indigo mx-auto flex w-full max-w-[1100px] flex-col gap-9 p-6 sm:p-12" data-testid="kalkulator-wizard">
+      <ProgressDots total={STEPS.length} current={stepIndex} accent="ochre" />
 
       <form
         onSubmit={(event) => {
           event.preventDefault()
           handleNext()
         }}
-        className="flex flex-col gap-6"
+        className="flex flex-col items-center gap-8"
       >
         {step === 'omzet' && (
-          <fieldset className="flex flex-col gap-4">
-            <legend className="mb-2 text-lg font-bold text-white sm:text-xl">{QUESTIONS.omzet}</legend>
-            <div className="flex flex-col gap-3">
+          <fieldset className="flex w-full max-w-[640px] flex-col items-center gap-6">
+            <legend className="mb-1 text-center text-2xl font-bold text-white">{QUESTIONS.omzet}</legend>
+            <div className="flex w-full flex-col gap-3">
               {OMZET_OPTIONS.map((option) => (
                 <OptionCard
                   key={option.value}
@@ -87,9 +88,9 @@ function KalkulatorWizard({ onComplete }) {
         )}
 
         {step === 'pengalaman' && (
-          <fieldset className="flex flex-col gap-4">
-            <legend className="mb-2 text-lg font-bold text-white sm:text-xl">{QUESTIONS.pengalaman}</legend>
-            <div className="flex flex-col gap-3">
+          <fieldset className="flex w-full max-w-[640px] flex-col items-center gap-6">
+            <legend className="mb-1 text-center text-2xl font-bold text-white">{QUESTIONS.pengalaman}</legend>
+            <div className="flex w-full flex-col gap-3">
               {PENGALAMAN_OPTIONS.map((option) => (
                 <OptionCard
                   key={option.value}
@@ -112,9 +113,9 @@ function KalkulatorWizard({ onComplete }) {
         )}
 
         {step === 'waktu' && (
-          <fieldset className="flex flex-col gap-4">
-            <legend className="mb-2 text-lg font-bold text-white sm:text-xl">{QUESTIONS.waktu}</legend>
-            <div className="flex flex-col gap-3">
+          <fieldset className="flex w-full max-w-[640px] flex-col items-center gap-6">
+            <legend className="mb-1 text-center text-2xl font-bold text-white">{QUESTIONS.waktu}</legend>
+            <div className="flex w-full flex-col gap-3">
               {WAKTU_OPTIONS.map((option) => (
                 <OptionCard
                   key={option.value}
@@ -131,9 +132,9 @@ function KalkulatorWizard({ onComplete }) {
         )}
 
         {step === 'rekening' && (
-          <fieldset className="flex flex-col gap-4">
-            <legend className="mb-2 text-lg font-bold text-white sm:text-xl">{QUESTIONS.rekening}</legend>
-            <div className="flex flex-col gap-3">
+          <fieldset className="flex w-full max-w-[640px] flex-col items-center gap-6">
+            <legend className="mb-1 text-center text-2xl font-bold text-white">{QUESTIONS.rekening}</legend>
+            <div className="flex w-full flex-col gap-3">
               {REKENING_OPTIONS.map((option) => (
                 <OptionCard
                   key={option.value}
@@ -149,12 +150,14 @@ function KalkulatorWizard({ onComplete }) {
           </fieldset>
         )}
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex w-full max-w-[640px] items-center justify-between gap-3">
           <button type="button" className="btn-ghost" onClick={handlePrev} disabled={stepIndex === 0}>
+            <ArrowLeft size={16} aria-hidden="true" />
             Sebelumnya
           </button>
-          <button type="submit" className="btn-primary" disabled={!canProceed}>
+          <button type="submit" className="btn-primary-indigo" disabled={!canProceed}>
             {isLastStep ? 'Lihat hasil' : 'Lanjut'}
+            <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
       </form>

@@ -12,14 +12,16 @@ function App() {
       <a href="#konten-utama" className="skip-link">
         Langsung ke konten utama
       </a>
-      <Topbar />
-      <div id="konten-utama">
-        <Routes>
-          <Route path="/" element={<Beranda />} />
-          <Route path="/kalkulator" element={<Kalkulator />} />
-          <Route path="/keamanan" element={<Keamanan />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+      <div className="textured-bg min-h-screen">
+        <Topbar />
+        <div id="konten-utama">
+          <Routes>
+            <Route path="/" element={<Beranda />} />
+            <Route path="/kalkulator" element={<Kalkulator />} />
+            <Route path="/keamanan" element={<Keamanan />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </div>
     </ErrorBoundary>
   )

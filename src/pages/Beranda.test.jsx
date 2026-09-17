@@ -30,7 +30,7 @@ describe('Beranda onboarding', () => {
     const user = userEvent.setup()
     renderBeranda()
 
-    await user.click(screen.getByRole('link', { name: /Kalkulator QRIS/ }))
+    await user.click(screen.getByRole('link', { name: /Hitung sekarang/ }))
 
     expect(screen.queryByText('Mulai di sini ↑')).not.toBeInTheDocument()
     expect(window.localStorage.getItem('ntt_onboarding_seen')).toBe('true')

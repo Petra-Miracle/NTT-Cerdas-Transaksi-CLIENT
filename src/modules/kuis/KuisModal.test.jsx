@@ -14,7 +14,7 @@ async function answerAllCorrectly(user) {
     const soal = KUIS_LIST[i]
     await user.click(screen.getByText(soal.opsi[soal.benar]))
     const isLast = i === KUIS_LIST.length - 1
-    await user.click(screen.getByRole('button', { name: isLast ? 'Lihat skor' : 'Lanjut' }))
+    await user.click(screen.getByRole('button', { name: isLast ? 'Lihat skor' : 'Soal Berikutnya' }))
   }
 }
 
@@ -44,7 +44,7 @@ describe('KuisModal', () => {
     render(<KuisModal isOpen onClose={vi.fn()} />)
 
     await user.click(screen.getByText(KUIS_LIST[0].opsi[KUIS_LIST[0].benar]))
-    await user.click(screen.getByRole('button', { name: 'Lanjut' }))
+    await user.click(screen.getByRole('button', { name: 'Soal Berikutnya' }))
     expect(screen.getByText('Soal 2 dari 10')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Tutup' }))

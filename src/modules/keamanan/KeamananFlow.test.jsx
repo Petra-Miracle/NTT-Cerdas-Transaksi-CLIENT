@@ -31,15 +31,15 @@ describe('KeamananFlow', () => {
         'Cek sendiri nama yang muncul saat QR dipindai. Kalau memang beda dari nama tokomu, langsung lepas stiker QR itu dan laporkan.',
       ),
     )
-    expect(screen.getByText('Tepat!')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Lanjut' }))
+    expect(screen.getByText('Tepat sekali!')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
     await user.click(
       screen.getByText(
         'Tunggu sampai notifikasi transaksi resmi benar-benar muncul di HP atau rekeningmu sendiri, baru serahkan barangnya.',
       ),
     )
-    await user.click(screen.getByRole('button', { name: 'Lanjut' }))
+    await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
     await user.click(
       screen.getByText(
@@ -58,11 +58,11 @@ describe('KeamananFlow', () => {
     renderFlow()
 
     await user.click(screen.getByText('Suruh dia lanjut transfer saja, mungkin cuma salah lihat.'))
-    expect(screen.getByText('Belum tepat.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Lanjut' }))
+    expect(screen.getByText('Belum tepat')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
     await user.click(screen.getByText('Percaya saja karena sudah lihat buktinya di layar HP pembeli, langsung kasih barangnya.'))
-    await user.click(screen.getByRole('button', { name: 'Lanjut' }))
+    await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
     await user.click(screen.getByText('Anggap wajar saja, karena QRIS dinamis biasanya otomatis benar nominalnya.'))
     await user.click(screen.getByRole('button', { name: 'Lihat hasil' }))

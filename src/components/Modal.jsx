@@ -54,7 +54,7 @@ function Modal({ isOpen, onClose, titleId, panelClassName, children }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#05070C]/60 p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
@@ -64,15 +64,15 @@ function Modal({ isOpen, onClose, titleId, panelClassName, children }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`panel-glow relative max-h-[90vh] w-full max-w-[560px] overflow-y-auto p-6 sm:p-8 ${panelClassName ?? ''}`}
+        className={`panel-glow relative max-h-[90vh] w-full max-w-[640px] overflow-y-auto p-6 sm:p-8 ${panelClassName ?? ''}`}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Tutup"
-          className="absolute right-4 top-4 rounded-full p-1.5 text-white/70 transition hover:bg-white/10 hover:text-white"
+          className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition hover:bg-white/10 hover:text-white"
         >
-          <X size={20} aria-hidden="true" />
+          <X size={15} aria-hidden="true" />
         </button>
         {children}
       </div>
