@@ -1,7 +1,7 @@
 import { ArrowRight, BadgeCheck, BookOpenCheck, Calculator, Landmark, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import maskotKora from '../assets/img/BonekaKoRa.jpg'
+import maskotKora from '../assets/img/BonekaKoRa-removebg.png'
 import ModuleCard from '../components/ModuleCard'
 import { useOnboarding } from '../hooks/useOnboarding'
 import KuisModal from '../modules/kuis/KuisModal'
@@ -58,7 +58,7 @@ function Beranda() {
           <img
             src={maskotKora}
             alt="Maskot KoRa, Duta Rupiah Flobamora, melambaikan tangan"
-            className="relative h-[340px] w-[280px] rounded-[32px] object-cover shadow-2xl"
+            className="relative h-[360px] w-auto object-contain drop-shadow-2xl"
           />
         </div>
       </section>
