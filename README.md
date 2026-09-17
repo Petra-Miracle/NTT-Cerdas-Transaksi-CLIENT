@@ -89,10 +89,11 @@ Button/Primary, Button/Ghost, Pill/Badge, Topbar). Perubahan utama:
   latar. Didekati dengan pola SVG diamond berulang beropasitas rendah
   (`.textured-bg` di `src/index.css`) yang divisualisasikan mirip pada
   render Pencil.
-- **Maskot "KoRa"**: file desain lama menyebut aset ini hilang, tetapi
-  ternyata sudah digambar ulang penuh sebagai vector art di dalam file
-  `.pen` (bukan gambar impor). Diekspor langsung dari Pencil ke
-  `src/assets/maskot-kora.png` dan dipakai di Hero beranda.
+- **Maskot "KoRa"**: sempat direkonstruksi sebagai vector art dari file
+  `.pen` (diekspor ke PNG), lalu diganti pemilik proyek dengan foto render
+  resmi maskot "KoRa" (`src/assets/img/BonekaKoRa.jpg`, dikompres dari
+  ~1.5MB jadi ~40KB via `ffmpeg` supaya tidak membengkakkan bundle) yang
+  dipakai di Hero beranda.
 - **Salinan pemasaran baru** (bukan dari handoff, bebas diubah pemilik
   proyek): headline & subheadline Hero, eyebrow "Program Edukasi Transaksi
   Digital NTT", judul seksi modul "Belajar Transaksi Digital Lewat Praktik

@@ -1,7 +1,7 @@
 import { ArrowRight, BadgeCheck, BookOpenCheck, Calculator, Landmark, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import maskotKora from '../assets/maskot-kora.png'
+import maskotKora from '../assets/img/BonekaKoRa.jpg'
 import ModuleCard from '../components/ModuleCard'
 import { useOnboarding } from '../hooks/useOnboarding'
 import KuisModal from '../modules/kuis/KuisModal'
