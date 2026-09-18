@@ -244,6 +244,29 @@
   .mascot-float {
     animation: mascot-float 3.2s ease-in-out infinite;
   }
+
+  .coin-flip {
+    animation: coin-flip 1.8s linear infinite;
+    transform-style: preserve-3d;
+  }
+
+  .coin-face {
+    @apply absolute inset-0 flex items-center justify-center rounded-full bg-[#FEF7DC] shadow-2xl [backface-visibility:hidden];
+  }
+
+  .coin-face-back {
+    transform: rotateY(180deg);
+  }
+
+  .coin-ring {
+    @apply absolute -inset-2 rounded-full border-2 pointer-events-none;
+    border-color: rgb(231 177 92 / 35%);
+    animation: spin-ring 3s linear infinite;
+  }
+
+  .fade-scale-in {
+    animation: fade-scale-in 0.3s ease-out both;
+  }
 }
 
 @keyframes onboarding-pulse {
@@ -254,6 +277,34 @@
 
   50% {
     box-shadow: 0 0 0 12px rgb(231 177 92 / 0%);
+  }
+}
+
+@keyframes coin-flip {
+  from {
+    transform: rotateY(0deg);
+  }
+
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes spin-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
