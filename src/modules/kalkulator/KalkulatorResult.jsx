@@ -11,9 +11,9 @@ import {
 } from './kalkulatorContent'
 
 const COINS = [
-  { className: 'top-0 left-2 h-9 w-9', rotate: '-10deg', delay: '0s' },
-  { className: 'top-2 right-6 h-7 w-7', rotate: '12deg', delay: '0.6s' },
-  { className: 'bottom-0 right-0 h-5 w-5', rotate: '-6deg', delay: '1.1s' },
+  { className: '-top-3 -left-4 h-9 w-9', rotate: '-10deg', delay: '0s' },
+  { className: '-top-2 -right-5 h-7 w-7', rotate: '12deg', delay: '0.6s' },
+  { className: '-bottom-2 -right-1 h-5 w-5', rotate: '-6deg', delay: '1.1s' },
 ]
 
 function KalkulatorResult({ answers, result, onReset }) {
