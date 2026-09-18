@@ -28,7 +28,7 @@ function Beranda() {
 
           <p className="text-lg leading-relaxed text-[var(--color-ink-on-bg-muted)]">
             NTT Cerdas Transaksi membantumu menghitung penghematan QRIS, mengenali risiko penipuan, dan
-            menguji pemahaman Cinta Bangga Paham Rupiah — lewat tiga modul interaktif untuk pedagang UMKM
+            menguji pemahaman Cinta Bangga Paham Rupiah lewat tiga modul interaktif untuk pedagang UMKM
             Kupang.
           </p>
 
