@@ -1,9 +1,10 @@
 import { ArrowRight, Bell, CircleCheck, CircleX, QrCode, ScanLine } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnswerCard from '../../components/AnswerCard'
 import ProgressDots from '../../components/ProgressDots'
 import { submitSkenarioAttempt } from '../../services/api'
+import { shuffleArray } from '../../utils/shuffle'
 import { SKENARIO_LIST, SKENARIO_PESAN_BELUM_SEMPURNA, SKENARIO_PESAN_SEMPURNA } from './keamananContent'
 
 const TOTAL = SKENARIO_LIST.length
@@ -20,10 +21,11 @@ function KeamananFlow() {
   const skenario = SKENARIO_LIST[state.index]
   const ScenarioIcon = SKENARIO_ICONS[state.index]
   const isAnswered = state.selected !== null
+  const opsi = useMemo(() => shuffleArray(skenario.opsi), [skenario])
 
   const handleSelect = (optionIndex) => {
     if (isAnswered) return
-    const benar = skenario.opsi[optionIndex].benar
+    const benar = opsi[optionIndex].benar
     setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0) }))
   }
 
@@ -86,13 +88,13 @@ function KeamananFlow() {
       </div>
 
       <div className="flex flex-col gap-3">
-        {skenario.opsi.map((opsi, index) => (
+        {opsi.map((item, index) => (
           <AnswerCard
-            key={index}
-            label={opsi.label}
+            key={item.label}
+            label={item.label}
             isAnswered={isAnswered}
             isSelected={state.selected === index}
-            isCorrect={isAnswered && opsi.benar}
+            isCorrect={isAnswered && item.benar}
             onClick={() => handleSelect(index)}
           />
         ))}
@@ -101,20 +103,20 @@ function KeamananFlow() {
       {isAnswered && (
         <div className="callout-slot flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
-            {skenario.opsi[state.selected].benar ? (
+            {opsi[state.selected].benar ? (
               <CircleCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
             ) : (
               <CircleX size={20} className="text-[var(--color-danger)]" aria-hidden="true" />
             )}
             <p
               className="text-base font-bold"
-              style={{ color: skenario.opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
+              style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
             >
-              {skenario.opsi[state.selected].benar ? 'Tepat sekali!' : 'Belum tepat'}
+              {opsi[state.selected].benar ? 'Tepat sekali!' : 'Belum tepat'}
             </p>
           </div>
           <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">
-            {skenario.opsi[state.selected].feedback}
+            {opsi[state.selected].feedback}
           </p>
           <button type="button" className="btn-primary-rust w-fit self-end" onClick={handleNext}>
             {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}

@@ -1,9 +1,10 @@
 import { ArrowRight, CircleCheck, CircleX } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import AnswerCard from '../../components/AnswerCard'
 import Modal from '../../components/Modal'
 import ProgressDots from '../../components/ProgressDots'
 import { submitKuisAttempt } from '../../services/api'
+import { shuffleArray } from '../../utils/shuffle'
 import { getKuisMessage, KUIS_LIST } from './kuisContent'
 
 const TOTAL = KUIS_LIST.length
@@ -26,10 +27,14 @@ function KuisModal({ isOpen, onClose }) {
 
   const soal = KUIS_LIST[state.index]
   const isAnswered = state.selected !== null
+  const opsi = useMemo(
+    () => shuffleArray(soal.opsi.map((label, index) => ({ label, benar: index === soal.benar }))),
+    [soal],
+  )
 
   const handleSelect = (optionIndex) => {
     if (isAnswered) return
-    const benar = optionIndex === soal.benar
+    const benar = opsi[optionIndex].benar
     setState((prev) => ({ ...prev, selected: optionIndex, correctCount: prev.correctCount + (benar ? 1 : 0) }))
   }
 
@@ -87,13 +92,13 @@ function KuisModal({ isOpen, onClose }) {
           </div>
 
           <div className="flex flex-col gap-2.5">
-            {soal.opsi.map((opsi, index) => (
+            {opsi.map((item, index) => (
               <AnswerCard
-                key={index}
-                label={opsi}
+                key={item.label}
+                label={item.label}
                 isAnswered={isAnswered}
                 isSelected={state.selected === index}
-                isCorrect={isAnswered && index === soal.benar}
+                isCorrect={isAnswered && item.benar}
                 onClick={() => handleSelect(index)}
               />
             ))}
@@ -102,16 +107,16 @@ function KuisModal({ isOpen, onClose }) {
           {isAnswered && (
             <div className="callout-slot flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                {state.selected === soal.benar ? (
+                {opsi[state.selected].benar ? (
                   <CircleCheck size={16} className="text-[var(--color-sage)]" aria-hidden="true" />
                 ) : (
                   <CircleX size={16} className="text-[var(--color-danger)]" aria-hidden="true" />
                 )}
                 <p
                   className="text-sm font-bold"
-                  style={{ color: state.selected === soal.benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
+                  style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
                 >
-                  {state.selected === soal.benar ? 'Tepat!' : 'Belum tepat'}
+                  {opsi[state.selected].benar ? 'Tepat!' : 'Belum tepat'}
                 </p>
               </div>
               <p className="text-[13px] leading-relaxed text-[var(--color-ink-on-bg-muted)]">{soal.penjelasan}</p>
