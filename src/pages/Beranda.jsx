@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import maskotKora from '../assets/img/BonekaKoRa-removebg.png'
 import ModuleCard from '../components/ModuleCard'
+import Reveal from '../components/Reveal'
 import { useOnboarding } from '../hooks/useOnboarding'
 import KuisModal from '../modules/kuis/KuisModal'
 
@@ -12,7 +13,7 @@ function Beranda() {
 
   return (
     <main>
-      <section className="mx-auto flex max-w-[1280px] flex-col items-center gap-16 px-6 py-8 sm:px-10 lg:flex-row lg:px-20 lg:py-16">
+      <section className="mx-auto flex min-h-[calc(100svh-88px)] max-w-[1280px] flex-col items-center justify-center gap-16 px-6 py-8 sm:px-10 lg:flex-row lg:px-20 lg:py-16">
         <div className="flex max-w-[560px] flex-col items-center gap-7 text-center lg:items-start lg:text-left">
           <span className="pill-badge">
             <Landmark size={14} className="text-[var(--color-ochre)]" aria-hidden="true" />
@@ -63,7 +64,11 @@ function Beranda() {
         </div>
       </section>
 
-      <section id="modul" className="mx-auto flex max-w-[1280px] flex-col gap-10 px-6 pb-16 sm:px-10 lg:px-20">
+      <Reveal
+        as="section"
+        id="modul"
+        className="mx-auto flex max-w-[1280px] flex-col gap-10 px-6 pb-16 sm:px-10 lg:px-20"
+      >
         <div className="mx-auto flex max-w-[640px] flex-col items-center gap-3 text-center">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-ochre)] uppercase">
             Tiga Modul Interaktif
@@ -121,7 +126,7 @@ function Beranda() {
             />
           </div>
         </div>
-      </section>
+      </Reveal>
 
       <KuisModal isOpen={isKuisOpen} onClose={() => setIsKuisOpen(false)} />
     </main>

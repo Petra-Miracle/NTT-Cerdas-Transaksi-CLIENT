@@ -267,6 +267,22 @@
   .fade-scale-in {
     animation: fade-scale-in 0.3s ease-out both;
   }
+
+  /* Scroll-reveal for sections below the fold: every section fades/slides
+     in the same way the first time it enters the viewport, so pacing feels
+     consistent instead of each section just being visible on page load. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes onboarding-pulse {
