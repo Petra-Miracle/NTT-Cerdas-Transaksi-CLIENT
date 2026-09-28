@@ -1,15 +1,49 @@
-import { ArrowRight, BadgeCheck, BookOpenCheck, Calculator, Landmark, ShieldCheck } from 'lucide-react'
+import { ArrowRight, BadgeCheck, BookOpenCheck, Calculator, Landmark, Repeat2, ShieldCheck, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import maskotKora from '../assets/img/BonekaKoRa-removebg.png'
 import ModuleCard from '../components/ModuleCard'
+import ProductTour from '../components/ProductTour'
 import Reveal from '../components/Reveal'
-import { useOnboarding } from '../hooks/useOnboarding'
+import { useProductTour } from '../hooks/useProductTour'
 import KuisModal from '../modules/kuis/KuisModal'
+
+const BERANDA_TOUR_STEPS = [
+  {
+    target: 'menu-brand',
+    title: 'Selamat datang di NTT Cerdas Transaksi',
+    desc: 'Ini beranda utama. Klik logo ini kapan saja untuk kembali ke sini dari halaman mana pun.',
+  },
+  {
+    target: 'menu-cta',
+    title: 'Mulai cepat dari sini',
+    desc: 'Tombol ini langsung membawamu ke Kalkulator QRIS — modul yang paling cocok untuk memulai.',
+  },
+  {
+    target: 'module-kalkulator',
+    title: '1. Kalkulator QRIS',
+    desc: 'Hitung berapa banyak waktu dan risiko tunai yang bisa kamu hemat kalau beralih ke QRIS.',
+  },
+  {
+    target: 'module-keamanan',
+    title: '2. Keamanan QRIS',
+    desc: 'Uji kepekaanmu lewat skenario nyata penipuan QRIS, lengkap dengan info kanal pengaduan resmi.',
+  },
+  {
+    target: 'module-kuis',
+    title: '3. Kuis CBP Rupiah',
+    desc: 'Uji pemahamanmu soal cara mengecek keaslian dan merawat uang rupiah.',
+  },
+  {
+    target: 'module-produklokal',
+    title: '4. Lokal atau Bukan?',
+    desc: 'Tebak mana produk lokal/buatan Indonesia dan mana yang produk impor lewat kartu-kartu seru ini.',
+  },
+]
 
 function Beranda() {
   const [isKuisOpen, setIsKuisOpen] = useState(false)
-  const { showOnboarding, markSeen } = useOnboarding()
+  const tour = useProductTour('beranda', BERANDA_TOUR_STEPS.length)
 
   return (
     <main>
@@ -27,9 +61,9 @@ function Beranda() {
           </h1>
 
           <p className="text-lg leading-relaxed text-[var(--color-ink-on-bg-muted)]">
-            NTT Cerdas Transaksi membantumu menghitung penghematan QRIS, mengenali risiko penipuan, dan
-            menguji pemahaman Cinta Bangga Paham Rupiah lewat tiga modul interaktif untuk pedagang UMKM
-            Kupang.
+            NTT Cerdas Transaksi membantumu menghitung penghematan QRIS, mengenali risiko penipuan, menguji
+            pemahaman Cinta Bangga Paham Rupiah, dan mengenali produk lokal lewat empat modul interaktif
+            untuk pedagang UMKM Kupang.
           </p>
 
           <div className="flex flex-col items-center gap-4 sm:flex-row">
@@ -71,37 +105,34 @@ function Beranda() {
       >
         <div className="mx-auto flex max-w-[640px] flex-col items-center gap-3 text-center">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-ochre)] uppercase">
-            Tiga Modul Interaktif
+            Empat Modul Interaktif
           </p>
           <h2 className="text-[28px] font-bold text-white sm:text-[34px]">
             Belajar Transaksi Digital Lewat Praktik Langsung
           </h2>
+          <button
+            type="button"
+            onClick={tour.restart}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-ink-on-bg-muted)] hover:text-white"
+          >
+            <Repeat2 size={13} aria-hidden="true" />
+            Lihat panduan lagi
+          </button>
         </div>
 
         <div className="panel-glow panel-glow-indigo p-6 sm:p-10">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            <div className="relative">
-              {showOnboarding && (
-                <div
-                  className="absolute -top-12 left-1/2 z-10 -translate-x-1/2 rounded-full bg-[var(--color-ochre)] px-4 py-2 text-xs font-semibold whitespace-nowrap text-[var(--color-ochre-text)] shadow-lg"
-                  role="status"
-                >
-                  Mulai di sini ↑
-                </div>
-              )}
-              <ModuleCard
-                index="01"
-                Icon={Calculator}
-                eyebrow="Mulai di sini"
-                title="Kalkulator QRIS"
-                desc="Hitung berapa banyak waktu dan risiko tunai yang bisa kamu hemat dengan beralih ke QRIS."
-                ctaLabel="Hitung sekarang"
-                accent="indigo"
-                to="/kalkulator"
-                onClick={markSeen}
-                highlighted={showOnboarding}
-              />
-            </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <ModuleCard
+              index="01"
+              Icon={Calculator}
+              eyebrow="Mulai di sini"
+              title="Kalkulator QRIS"
+              desc="Hitung berapa banyak waktu dan risiko tunai yang bisa kamu hemat dengan beralih ke QRIS."
+              ctaLabel="Hitung sekarang"
+              accent="indigo"
+              to="/kalkulator"
+              tourId="module-kalkulator"
+            />
 
             <ModuleCard
               index="02"
@@ -112,6 +143,7 @@ function Beranda() {
               ctaLabel="Coba skenario"
               accent="rust"
               to="/keamanan"
+              tourId="module-keamanan"
             />
 
             <ModuleCard
@@ -123,12 +155,34 @@ function Beranda() {
               ctaLabel="Mulai kuis"
               accent="sage"
               onClick={() => setIsKuisOpen(true)}
+              tourId="module-kuis"
+            />
+
+            <ModuleCard
+              index="04"
+              Icon={ShoppingBag}
+              eyebrow="Cintai produk lokal"
+              title="Lokal atau Bukan?"
+              desc="Tebak 8 kartu produk — mana yang lokal/buatan Indonesia, mana yang produk impor."
+              ctaLabel="Mulai tebak"
+              accent="ochre"
+              to="/produk-lokal"
+              tourId="module-produklokal"
             />
           </div>
         </div>
       </Reveal>
 
       <KuisModal isOpen={isKuisOpen} onClose={() => setIsKuisOpen(false)} />
+
+      <ProductTour
+        steps={BERANDA_TOUR_STEPS}
+        stepIndex={tour.stepIndex}
+        isActive={tour.isActive}
+        onNext={tour.next}
+        onPrev={tour.prev}
+        onSkip={tour.skip}
+      />
     </main>
   )
 }

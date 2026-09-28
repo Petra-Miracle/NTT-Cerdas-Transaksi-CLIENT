@@ -132,9 +132,10 @@ src/
     kalkulator/       kalkulatorContent.js (data) + kalkulatorLogic.js (rumus, murni)
     keamanan/         keamananContent.js (3 skenario)
     kuis/             kuisContent.js (10 soal)
-  pages/              Beranda, Kalkulator, Keamanan, NotFound
+  pages/              Beranda, Kalkulator, Keamanan, ProdukLokal, NotFound
   services/api.js     Lapisan fetch fire-and-forget ke backend
-  hooks/useOnboarding.js
+  hooks/useProductTour.js
+  components/ProductTour.jsx
   utils/format.js     formatRupiah, formatJam
 ```
 
@@ -155,9 +156,9 @@ dipisah dari komponen UI supaya bisa ditest independen dari tampilan.
   sempurna vs belum, ulangi).
 - Alur Kuis CBP end-to-end (skor & pesan akhir, submit analytics, modal
   selalu reset ke soal 1 saat ditutup).
-- Onboarding spotlight (tampil di kunjungan pertama, hilang & tersimpan ke
-  `localStorage` setelah kartu Kalkulator diklik, tidak pernah muncul di
-  kartu Keamanan/Kuis).
+- Product tour di beranda (tampil di kunjungan pertama, langkah-langkahnya
+  menyorot menu & kartu modul, hilang & tersimpan ke `localStorage` setelah
+  dilewati, bisa dipanggil lagi lewat tombol "Lihat panduan lagi").
 
 `npm run build` sukses (Vite + Tailwind v4 + HeroUI). Sudah diverifikasi
 manual di browser (beranda, wizard Kalkulator, skenario Keamanan) — tidak

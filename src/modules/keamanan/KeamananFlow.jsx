@@ -1,11 +1,17 @@
-import { ArrowRight, Bell, CircleCheck, CircleX, QrCode, ScanLine } from 'lucide-react'
+import { ArrowRight, Bell, CircleCheck, CircleX, Phone, QrCode, ScanLine, ShieldCheck } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnswerCard from '../../components/AnswerCard'
 import ProgressDots from '../../components/ProgressDots'
 import { submitSkenarioAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
-import { SKENARIO_LIST, SKENARIO_PESAN_BELUM_SEMPURNA, SKENARIO_PESAN_SEMPURNA } from './keamananContent'
+import {
+  HAK_KONSUMEN_DIGITAL,
+  KANAL_PENGADUAN_RESMI,
+  SKENARIO_LIST,
+  SKENARIO_PESAN_BELUM_SEMPURNA,
+  SKENARIO_PESAN_SEMPURNA,
+} from './keamananContent'
 
 const TOTAL = SKENARIO_LIST.length
 const SKENARIO_ICONS = [QrCode, Bell, ScanLine]
@@ -46,33 +52,82 @@ function KeamananFlow() {
   if (selesai) {
     const sempurna = state.score === TOTAL
     return (
-      <div
-        className="panel-glow panel-glow-rust mx-auto flex w-full flex-col items-center gap-6 p-6 text-center sm:p-12"
-        data-testid="skenario-selesai"
-      >
-        <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-on-bg-muted)] uppercase">
-          Hasil kamu
-        </p>
-        <p className="text-4xl font-bold text-white">
-          {state.score}/{TOTAL} jawaban tepat di percobaan pertama
-        </p>
-        <p className="max-w-md text-[var(--color-ink-on-bg-muted)]">
-          {sempurna ? SKENARIO_PESAN_SEMPURNA : SKENARIO_PESAN_BELUM_SEMPURNA}
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="button" className="btn-primary-rust" onClick={handleRestart}>
-            ↻ Ulangi
-          </button>
-          <Link to="/" className="btn-ghost">
-            Kembali ke beranda
-          </Link>
+      <div className="mx-auto flex w-full flex-col gap-6">
+        <div
+          className="panel-glow panel-glow-rust flex w-full flex-col items-center gap-6 p-6 text-center sm:p-12"
+          data-testid="skenario-selesai"
+        >
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-on-bg-muted)] uppercase">
+            Hasil kamu
+          </p>
+          <p className="text-4xl font-bold text-white">
+            {state.score}/{TOTAL} jawaban tepat di percobaan pertama
+          </p>
+          <p className="max-w-md text-[var(--color-ink-on-bg-muted)]">
+            {sempurna ? SKENARIO_PESAN_SEMPURNA : SKENARIO_PESAN_BELUM_SEMPURNA}
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button type="button" className="btn-primary-rust" onClick={handleRestart}>
+              ↻ Ulangi
+            </button>
+            <Link to="/" className="btn-ghost">
+              Kembali ke beranda
+            </Link>
+          </div>
+        </div>
+
+        <div
+          className="panel-glow panel-glow-neutral flex w-full flex-col gap-6 p-6 text-left sm:p-10"
+          data-testid="perlindungan-konsumen"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="icon-chip h-10 w-10 border-none bg-white/10">
+              <ShieldCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
+            </span>
+            <h3 className="text-lg font-bold text-white">Kamu Punya Hak sebagai Konsumen Digital</h3>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {HAK_KONSUMEN_DIGITAL.map((hak) => (
+              <div key={hak.judul} className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-semibold text-white">{hak.judul}</p>
+                <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">{hak.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3 border-t border-white/10 pt-5">
+            <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-on-bg-muted)] uppercase">
+              Merasa dirugikan? Ini kanal pengaduan resminya
+            </p>
+            {KANAL_PENGADUAN_RESMI.map((kanal) => (
+              <div key={kanal.nama} className="flex items-start gap-3">
+                <span className="icon-chip h-9 w-9 shrink-0 border-none bg-white/10">
+                  <Phone size={16} className="text-[var(--color-ochre)]" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    {kanal.nama} · <span className="text-[var(--color-ochre)]">{kanal.kontak}</span>
+                  </p>
+                  <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">{kanal.desc}</p>
+                </div>
+              </div>
+            ))}
+            <p className="text-[11px] italic text-[var(--color-ink-on-bg-muted)]">
+              Bisa juga hubungi langsung bank atau penyedia QRIS yang kamu pakai untuk kasus yang lebih spesifik.
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="panel-glow panel-glow-rust mx-auto flex w-full flex-col gap-8 p-6 sm:p-12" data-testid="skenario-panel">
+    <div
+      className="panel-glow panel-glow-rust mx-auto flex w-full flex-col gap-8 p-6 sm:p-12"
+      data-testid="skenario-panel"
+      data-tour="keamanan-panel"
+    >
       <ProgressDots total={TOTAL} current={state.index} accent="rust" />
 
       <div className="flex items-start gap-5">

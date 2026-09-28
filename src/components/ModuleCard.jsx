@@ -23,6 +23,13 @@ const ACCENT = {
     icon: 'text-[var(--color-sage)]',
     eyebrow: 'text-[var(--color-sage)]',
   },
+  ochre: {
+    border: 'border-[#E7B15C33]',
+    index: 'text-[#E7B15CAA]',
+    iconWrap: 'bg-[#E7B15C1F] border-[#E7B15C40]',
+    icon: 'text-[var(--color-ochre)]',
+    eyebrow: 'text-[var(--color-ochre)]',
+  },
 }
 
 function CardInner({ index, Icon, eyebrow, title, desc, ctaLabel, accent }) {
@@ -44,22 +51,19 @@ function CardInner({ index, Icon, eyebrow, title, desc, ctaLabel, accent }) {
   )
 }
 
-function ModuleCard({ index, Icon, eyebrow, title, desc, ctaLabel, accent, to, onClick, highlighted, cardRef }) {
-  const className = `relative flex flex-col rounded-[20px] border bg-white/[0.03] p-7 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06] ${ACCENT[accent].border} ${
-    highlighted ? 'ring-2 ring-[var(--color-ochre)]' : ''
-  }`
-  const style = highlighted ? { animation: 'onboarding-pulse 1.8s ease-out infinite' } : undefined
+function ModuleCard({ index, Icon, eyebrow, title, desc, ctaLabel, accent, to, onClick, tourId }) {
+  const className = `relative flex flex-col rounded-[20px] border bg-white/[0.03] p-7 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06] ${ACCENT[accent].border}`
 
   if (to) {
     return (
-      <Link to={to} onClick={onClick} className={className} style={style} ref={cardRef}>
+      <Link to={to} onClick={onClick} className={className} data-tour={tourId}>
         <CardInner index={index} Icon={Icon} eyebrow={eyebrow} title={title} desc={desc} ctaLabel={ctaLabel} accent={accent} />
       </Link>
     )
   }
 
   return (
-    <button type="button" onClick={onClick} className={className} style={style} ref={cardRef}>
+    <button type="button" onClick={onClick} className={className} data-tour={tourId}>
       <CardInner index={index} Icon={Icon} eyebrow={eyebrow} title={title} desc={desc} ctaLabel={ctaLabel} accent={accent} />
     </button>
   )

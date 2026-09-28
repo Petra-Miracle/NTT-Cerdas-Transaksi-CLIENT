@@ -99,6 +99,10 @@
     background: radial-gradient(140% 180% at 50% -20%, #1c2a3a 0%, #0d141c 55%, #060a0f 100%);
   }
 
+  .panel-glow-ochre {
+    background: radial-gradient(140% 180% at 50% -20%, #3a2f1a 0%, #1c150d 55%, #0d0904 100%);
+  }
+
   /* Buttons — pill CTAs with a per-context accent gradient, matching the
      "Button/Primary" component: ochre by default for marketing CTAs,
      module-accent overrides (indigo/rust/sage) for in-flow "Lanjut" actions. */
@@ -268,6 +272,33 @@
     animation: fade-scale-in 0.3s ease-out both;
   }
 
+  /* Product tour: dark backdrop with a "cutout" spotlight box positioned
+     over the current step's target element, plus a small floating card. */
+  .tour-spotlight {
+    position: fixed;
+    border-radius: 16px;
+    box-shadow: 0 0 0 9999px rgb(5 7 16 / 75%);
+    outline: 2px solid var(--color-ochre);
+    outline-offset: 2px;
+    pointer-events: none;
+    transition:
+      top 0.25s ease,
+      left 0.25s ease,
+      width 0.25s ease,
+      height 0.25s ease;
+  }
+
+  .tour-tooltip {
+    position: fixed;
+    z-index: 1;
+    width: min(320px, calc(100vw - 32px));
+    border-radius: var(--radius-panel-sm);
+    border: 1px solid rgb(255 255 255 / 12%);
+    background: linear-gradient(180deg, #1c2a44, #101a2e);
+    box-shadow: 0 20px 45px -15px rgb(5 7 16 / 60%);
+    padding: 18px 20px;
+  }
+
   /* Scroll-reveal for sections below the fold: every section fades/slides
      in the same way the first time it enters the viewport, so pacing feels
      consistent instead of each section just being visible on page load. */
@@ -282,17 +313,6 @@
   .reveal-visible {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes onboarding-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgb(231 177 92 / 55%);
-  }
-
-  50% {
-    box-shadow: 0 0 0 12px rgb(231 177 92 / 0%);
   }
 }
 

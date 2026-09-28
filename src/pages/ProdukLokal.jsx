@@ -2,18 +2,18 @@ import { ArrowLeft, Repeat2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import ProductTour from '../components/ProductTour'
 import { useProductTour } from '../hooks/useProductTour'
-import KeamananFlow from '../modules/keamanan/KeamananFlow'
+import ProdukLokalFlow from '../modules/produklokal/ProdukLokalFlow'
 
 const TOUR_STEPS = [
   {
-    target: 'keamanan-panel',
-    title: 'Cara pakai Keamanan QRIS',
-    desc: 'Baca tiap skenario, pilih tindakan yang menurutmu paling tepat, lalu lihat feedbacknya. Setelah 3 skenario selesai, ada juga info kanal pengaduan resmi.',
+    target: 'produklokal-panel',
+    title: 'Cara main "Lokal atau Bukan?"',
+    desc: 'Baca nama & deskripsi produknya, lalu tebak apakah itu produk lokal/buatan Indonesia atau produk impor. Ada fakta menarik di tiap jawaban!',
   },
 ]
 
-function Keamanan() {
-  const tour = useProductTour('keamanan', TOUR_STEPS.length)
+function ProdukLokal() {
+  const tour = useProductTour('produklokal', TOUR_STEPS.length)
 
   return (
     <main className="mx-auto flex w-full max-w-[900px] flex-col items-center gap-8 px-6 pb-20 sm:px-10">
@@ -23,9 +23,9 @@ function Keamanan() {
       </Link>
 
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-4xl font-bold text-white">Keamanan QRIS</h1>
+        <h1 className="text-4xl font-bold text-white">Cintai Produk Lokal</h1>
         <p className="max-w-[560px] text-base text-[var(--color-ink-on-bg-muted)]">
-          Tiga skenario nyata yang sering dialami pedagang — pilih tindakan yang menurutmu paling tepat.
+          Tebak 8 kartu produk — mana yang lokal/buatan Indonesia, mana yang produk impor.
         </p>
         <button
           type="button"
@@ -37,7 +37,7 @@ function Keamanan() {
         </button>
       </div>
 
-      <KeamananFlow />
+      <ProdukLokalFlow />
 
       <ProductTour
         steps={TOUR_STEPS}
@@ -51,4 +51,4 @@ function Keamanan() {
   )
 }
 
-export default Keamanan
+export default ProdukLokal

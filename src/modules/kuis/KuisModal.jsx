@@ -1,14 +1,24 @@
-import { ArrowRight, CircleCheck, CircleX } from 'lucide-react'
+import { ArrowRight, CircleCheck, CircleX, Repeat2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import AnswerCard from '../../components/AnswerCard'
 import Modal from '../../components/Modal'
+import ProductTour from '../../components/ProductTour'
 import ProgressDots from '../../components/ProgressDots'
+import { useProductTour } from '../../hooks/useProductTour'
 import { submitKuisAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
 import { getKuisMessage, KUIS_LIST } from './kuisContent'
 
 const TOTAL = KUIS_LIST.length
 const TITLE_ID = 'kuis-modal-title'
+
+const TOUR_STEPS = [
+  {
+    target: 'kuis-panel',
+    title: 'Cara main Kuis CBP Rupiah',
+    desc: 'Pilih salah satu jawaban tiap soal, lihat penjelasannya, lalu lanjut ke soal berikutnya sampai skor akhirmu muncul.',
+  },
+]
 
 function createInitialState() {
   return { index: 0, selected: null, correctCount: 0 }
@@ -17,6 +27,7 @@ function createInitialState() {
 function KuisModal({ isOpen, onClose }) {
   const [state, setState] = useState(createInitialState)
   const [selesai, setSelesai] = useState(false)
+  const tour = useProductTour('kuis', TOUR_STEPS.length)
 
   const handleClose = () => {
     onClose()
@@ -54,9 +65,17 @@ function KuisModal({ isOpen, onClose }) {
       <h2 id={TITLE_ID} className="mb-1 text-[26px] font-bold text-white">
         Kuis CBP Rupiah
       </h2>
-      <p className="mb-6 text-sm text-[var(--color-ink-on-bg-muted)]">
+      <p className="mb-1 text-sm text-[var(--color-ink-on-bg-muted)]">
         10 soal seputar cara mengecek keaslian dan merawat uang rupiah.
       </p>
+      <button
+        type="button"
+        onClick={tour.restart}
+        className="mb-6 inline-flex w-fit items-center gap-1.5 text-xs font-medium text-[var(--color-ink-on-bg-muted)] hover:text-white"
+      >
+        <Repeat2 size={13} aria-hidden="true" />
+        Lihat panduan lagi
+      </button>
 
       {selesai ? (
         <div className="flex flex-col items-center gap-4 text-center" data-testid="kuis-selesai">
@@ -81,7 +100,7 @@ function KuisModal({ isOpen, onClose }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-5" data-testid="kuis-content">
+        <div className="flex flex-col gap-5" data-testid="kuis-content" data-tour="kuis-panel">
           <ProgressDots total={TOTAL} current={state.index} accent="sage" variant="flat" />
 
           <div className="flex flex-col gap-3">
@@ -128,6 +147,15 @@ function KuisModal({ isOpen, onClose }) {
           )}
         </div>
       )}
+
+      <ProductTour
+        steps={TOUR_STEPS}
+        stepIndex={tour.stepIndex}
+        isActive={tour.isActive && isOpen && !selesai}
+        onNext={tour.next}
+        onPrev={tour.prev}
+        onSkip={tour.skip}
+      />
     </Modal>
   )
 }

@@ -104,3 +104,33 @@ export const SKENARIO_PESAN_SEMPURNA =
 
 export const SKENARIO_PESAN_BELUM_SEMPURNA =
   'Terus diingat ya: selalu cek nama toko saat QR dipindai, tunggu notifikasi resmi di perangkatmu sendiri, dan selalu lihat nominal di layarmu sebelum menyerahkan barang.'
+
+// Penekanan tema Pelindungan Konsumen — ditambahkan terpisah dari skenario di
+// atas, tampil setelah pengguna menyelesaikan ketiga skenario.
+export const HAK_KONSUMEN_DIGITAL = [
+  {
+    judul: 'Hak atas informasi yang jelas',
+    desc: 'Kamu berhak tahu biaya, syarat, dan risiko transaksi digital sebelum menyetujui pembayaran apa pun.',
+  },
+  {
+    judul: 'Hak untuk mengajukan komplain',
+    desc: 'Kalau merasa dirugikan — salah transfer, dugaan penipuan, dan sejenisnya — kamu berhak melapor dan meminta penyelesaian.',
+  },
+  {
+    judul: 'Hak atas keamanan data',
+    desc: 'Data pribadi dan riwayat transaksimu wajib dijaga kerahasiaannya oleh bank atau penyedia layanan pembayaran.',
+  },
+]
+
+export const KANAL_PENGADUAN_RESMI = [
+  {
+    nama: 'Bank Indonesia — BICARA',
+    kontak: 'Call center 131',
+    desc: 'Untuk pertanyaan atau pengaduan seputar sistem pembayaran, termasuk QRIS.',
+  },
+  {
+    nama: 'OJK — Layanan Konsumen',
+    kontak: 'Call center 157',
+    desc: 'Untuk pengaduan terkait produk dan layanan keuangan, termasuk dugaan penipuan transaksi digital.',
+  },
+]

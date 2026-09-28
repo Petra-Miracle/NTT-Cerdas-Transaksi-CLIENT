@@ -1,13 +1,24 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Repeat2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import ProductTour from '../components/ProductTour'
+import { useProductTour } from '../hooks/useProductTour'
 import KalkulatorResult from '../modules/kalkulator/KalkulatorResult'
 import KalkulatorWizard from '../modules/kalkulator/KalkulatorWizard'
 import { calculateResult } from '../modules/kalkulator/kalkulatorLogic'
 import { submitKalkulatorResult } from '../services/api'
 
+const TOUR_STEPS = [
+  {
+    target: 'kalkulator-panel',
+    title: 'Cara pakai Kalkulator QRIS',
+    desc: 'Jawab 4 pertanyaan singkat dengan memilih kartu jawaban, lalu klik "Lanjut" di kanan bawah untuk lihat hasil penghematannya.',
+  },
+]
+
 function Kalkulator() {
   const [state, setState] = useState(null) // { answers, result }
+  const tour = useProductTour('kalkulator', TOUR_STEPS.length)
 
   const handleComplete = (answers) => {
     const result = calculateResult(answers)
@@ -37,6 +48,14 @@ function Kalkulator() {
           Jawab 4 pertanyaan singkat untuk melihat berapa banyak waktu dan potensi masalah uang tunai yang
           bisa kamu hindari dengan QRIS.
         </p>
+        <button
+          type="button"
+          onClick={tour.restart}
+          className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-[var(--color-ink-on-bg-muted)] hover:text-white"
+        >
+          <Repeat2 size={13} aria-hidden="true" />
+          Lihat panduan lagi
+        </button>
       </div>
 
       {state ? (
@@ -44,6 +63,15 @@ function Kalkulator() {
       ) : (
         <KalkulatorWizard onComplete={handleComplete} />
       )}
+
+      <ProductTour
+        steps={TOUR_STEPS}
+        stepIndex={tour.stepIndex}
+        isActive={tour.isActive}
+        onNext={tour.next}
+        onPrev={tour.prev}
+        onSkip={tour.skip}
+      />
     </main>
   )
 }

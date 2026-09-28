@@ -7,6 +7,7 @@ import Beranda from './pages/Beranda'
 import Kalkulator from './pages/Kalkulator'
 import Keamanan from './pages/Keamanan'
 import NotFound from './pages/NotFound'
+import ProdukLokal from './pages/ProdukLokal'
 
 function App() {
   const { isLoading, displayedLocation } = usePageTransition()
@@ -26,6 +27,7 @@ function App() {
               <Route path="/" element={<Beranda />} />
               <Route path="/kalkulator" element={<Kalkulator />} />
               <Route path="/keamanan" element={<Keamanan />} />
+              <Route path="/produk-lokal" element={<ProdukLokal />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           )}

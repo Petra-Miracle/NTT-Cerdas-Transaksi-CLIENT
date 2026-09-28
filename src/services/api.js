@@ -34,3 +34,7 @@ export function submitKuisAttempt(payload) {
 export function submitSkenarioAttempt(payload) {
   void postAnalytics('/api/skenario/attempts', payload)
 }
+
+export function submitProdukLokalAttempt(payload) {
+  void postAnalytics('/api/produk-lokal/attempts', payload)
+}

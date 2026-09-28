@@ -58,7 +58,11 @@ function KalkulatorWizard({ onComplete }) {
   }
 
   return (
-    <div className="panel-glow panel-glow-indigo mx-auto flex w-full max-w-[1100px] flex-col gap-9 p-6 sm:p-12" data-testid="kalkulator-wizard">
+    <div
+      className="panel-glow panel-glow-indigo mx-auto flex w-full max-w-[1100px] flex-col gap-9 p-6 sm:p-12"
+      data-testid="kalkulator-wizard"
+      data-tour="kalkulator-panel"
+    >
       <ProgressDots total={STEPS.length} current={stepIndex} accent="ochre" />
 
       <form

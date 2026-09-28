@@ -12,7 +12,7 @@ function renderBeranda() {
   )
 }
 
-describe('Beranda onboarding', () => {
+describe('Beranda product tour', () => {
   beforeEach(() => {
     window.localStorage.clear()
   })
@@ -21,33 +21,43 @@ describe('Beranda onboarding', () => {
     window.localStorage.clear()
   })
 
-  it('menampilkan tooltip onboarding pada kunjungan pertama', () => {
+  it('menampilkan tur produk pada kunjungan pertama', () => {
     renderBeranda()
-    expect(screen.getByText('Mulai di sini ↑')).toBeInTheDocument()
+    expect(screen.getByText('Selamat datang di NTT Cerdas Transaksi')).toBeInTheDocument()
   })
 
-  it('menyembunyikan tooltip dan menyimpan status setelah kartu Kalkulator diklik', async () => {
+  it('menyembunyikan tur dan menyimpan status setelah tombol Lewati diklik', async () => {
     const user = userEvent.setup()
     renderBeranda()
 
-    await user.click(screen.getByRole('link', { name: /Hitung sekarang/ }))
+    await user.click(screen.getByRole('button', { name: 'Lewati' }))
 
-    expect(screen.queryByText('Mulai di sini ↑')).not.toBeInTheDocument()
-    expect(window.localStorage.getItem('ntt_onboarding_seen')).toBe('true')
+    expect(screen.queryByText('Selamat datang di NTT Cerdas Transaksi')).not.toBeInTheDocument()
+    expect(window.localStorage.getItem('ntt_tour_seen_beranda')).toBe('true')
   })
 
-  it('tidak menampilkan tooltip lagi kalau sudah pernah dilihat', () => {
-    window.localStorage.setItem('ntt_onboarding_seen', 'true')
+  it('tidak menampilkan tur lagi kalau sudah pernah dilihat', () => {
+    window.localStorage.setItem('ntt_tour_seen_beranda', 'true')
     renderBeranda()
-    expect(screen.queryByText('Mulai di sini ↑')).not.toBeInTheDocument()
+    expect(screen.queryByText('Selamat datang di NTT Cerdas Transaksi')).not.toBeInTheDocument()
   })
 
-  it('kartu Keamanan QRIS dan Kuis CBP tidak pernah mendapat onboarding', () => {
+  it('bisa melihat panduan lagi lewat tombol "Lihat panduan lagi" setelah tur pernah dilewati', async () => {
+    const user = userEvent.setup()
+    window.localStorage.setItem('ntt_tour_seen_beranda', 'true')
     renderBeranda()
-    const keamananCard = screen.getByRole('link', { name: /Keamanan QRIS/ })
-    const kuisCard = screen.getByRole('button', { name: /Kuis CBP Rupiah/ })
-    const tooltip = screen.getByText('Mulai di sini ↑')
-    expect(keamananCard.contains(tooltip)).toBe(false)
-    expect(kuisCard.contains(tooltip)).toBe(false)
+
+    await user.click(screen.getByRole('button', { name: /Lihat panduan lagi/ }))
+    expect(screen.getByText('Selamat datang di NTT Cerdas Transaksi')).toBeInTheDocument()
+  })
+
+  it('menampilkan keempat kartu modul', () => {
+    window.localStorage.setItem('ntt_tour_seen_beranda', 'true')
+    renderBeranda()
+
+    expect(screen.getByRole('link', { name: /Hitung sekarang/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Keamanan QRIS/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Kuis CBP Rupiah/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Lokal atau Bukan/ })).toBeInTheDocument()
   })
 })
