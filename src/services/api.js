@@ -38,3 +38,11 @@ export function submitSkenarioAttempt(payload) {
 export function submitProdukLokalAttempt(payload) {
   void postAnalytics('/api/produk-lokal/attempts', payload)
 }
+
+export function submitFeedback(payload) {
+  void postAnalytics('/api/feedback', payload)
+}
+
+export function submitPemahamanAttempt(payload) {
+  void postAnalytics('/api/pemahaman/attempts', payload)
+}
