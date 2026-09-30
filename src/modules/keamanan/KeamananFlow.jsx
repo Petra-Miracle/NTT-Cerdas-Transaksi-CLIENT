@@ -176,7 +176,9 @@ function KeamananFlow() {
           <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">
             {opsi[state.selected].feedback}
           </p>
-          <KoraNote>{opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}</KoraNote>
+          <KoraNote outcome={opsi[state.selected].benar ? 'correct' : 'incorrect'}>
+            {opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}
+          </KoraNote>
           <button type="button" className="btn-primary-rust w-fit self-end" onClick={handleNext}>
             {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
             <ArrowRight size={16} aria-hidden="true" />

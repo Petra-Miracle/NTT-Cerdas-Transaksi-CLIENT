@@ -38,27 +38,44 @@ yang sudah final di sisi klien.
    yang sengaja tidak menyimpan skor modul ini (lihat handoff §6.1). Skor
    yang ditampilkan ke user tetap murni state sesi React, tidak pernah masuk
    `localStorage`.
-3. **Library UI**: Tailwind CSS v4 untuk layout/token dan seluruh komponen
-   (lihat catatan redesign di bawah — HeroUI sempat dipasang tapi akhirnya
-   dilepas), **Lucide-React** sebagai satu-satunya sumber ikon. MUI tidak
-   dipasang — tidak ada kebutuhan komponen di luar Tailwind.
+3. **Library UI**: Tailwind CSS v4 untuk layout/token dan seluruh komponen,
+   **Lucide-React** sebagai satu-satunya sumber ikon. Tidak ada library
+   komponen UI pihak ketiga.
 4. **API base URL**: `VITE_API_BASE_URL`, fallback `http://localhost:3000`.
+
+## Endpoint analytics yang dipanggil frontend
+
+Semua lewat `src/services/api.js`, fire-and-forget (`POST`, body JSON):
+
+| Fungsi | Endpoint | Status UI |
+| --- | --- | --- |
+| `submitKalkulatorResult` | `/api/kalkulator/submissions` | Aktif |
+| `submitKuisAttempt` | `/api/kuis/attempts` | Aktif |
+| `submitSkenarioAttempt` | `/api/skenario/attempts` | Aktif |
+| `submitProdukLokalAttempt` | `/api/produk-lokal/attempts` | Aktif |
+| `submitFeedback` | `/api/feedback` | Komponen siap, belum dipasang di modul |
+| `submitPemahamanAttempt` | `/api/pemahaman/attempts` | Komponen siap, belum dipasang di modul |
+
+Kontrak backend untuk dua endpoint terakhir ada di
+`Noted/Rebuild-Systems/PROMPT-BACKEND-ADDENDUM-feedback-pemahaman.md`.
 
 ## Keputusan implementasi tambahan (bukan dari handoff, murni teknis)
 
 - **Modal Kuis dan "option card"/"answer card" (radio/checkbox/jawaban
-  skenario) dibangun custom dengan Tailwind**, bukan lewat komponen HeroUI
-  `Modal`/`Radio`/`Checkbox`. HeroUI v3 memakai primitif React Aria
-  Components yang punya API compound cukup kompleks untuk kasus ini (state
-  benar/salah dinamis per opsi, highlight custom, indikator radio/checkbox
-  bergaya bebas dari desain Pencil). Setelah desain ulang (lihat bagian
-  berikut), **seluruh komponen UI ternyata dibangun custom dengan Tailwind**
-  mengikuti gaya visual dari file desain — dependensi `@heroui/react` dan
-  `framer-motion` akhirnya dilepas (`npm uninstall`) karena tidak lagi
-  dipakai sama sekali, supaya bundle CSS/JS tidak membawa kode yang tidak
-  terpakai (CSS bundle turun dari ~455KB ke ~36KB setelah dilepas).
-  Modal custom tetap mengimplementasikan `role="dialog"`, `aria-modal`,
-  focus trap, dan penutupan lewat Escape/klik backdrop.
+  skenario) dibangun custom dengan Tailwind** mengikuti gaya visual dari
+  file desain, supaya state benar/salah per opsi, highlight, dan indikator
+  radio/checkbox bisa bebas diatur tanpa membawa dependensi komponen yang
+  tidak terpakai. Modal custom tetap mengimplementasikan `role="dialog"`,
+  `aria-modal`, focus trap, dan penutupan lewat Escape/klik backdrop.
+- **Ulasan interaktif KoRa** (`src/components/KoraNote.jsx`): saat user
+  menjawab di Keamanan QRIS, Kuis CBP, dan Cintai Produk Lokal, KoRa bereaksi
+  sesuai jawaban — memantul + badge "Jawaban tepat!" untuk jawaban benar,
+  menggeleng pelan + badge "Yuk, pelajari lagi!" untuk jawaban yang perlu
+  diperbaiki. Ada efek suara singkat sintetis via Web Audio API
+  (`src/utils/koraSound.js`, tanpa file audio tambahan); gagal diam-diam
+  bila browser tidak mendukung. Animasi mengikuti `prefers-reduced-motion`.
+  Warna panel diatur lewat token `--color-kora-correct` dan
+  `--color-kora-incorrect` di `src/index.css`, terpisah dari warna modul.
 
 ## Redesign visual dari `Pendev/NTT-Cerdas-Transaksi.pen`
 
@@ -90,10 +107,9 @@ Button/Primary, Button/Ghost, Pill/Badge, Topbar). Perubahan utama:
   (`.textured-bg` di `src/index.css`) yang divisualisasikan mirip pada
   render Pencil.
 - **Maskot "KoRa"**: sempat direkonstruksi sebagai vector art dari file
-  `.pen` (diekspor ke PNG), lalu diganti pemilik proyek dengan foto render
-  resmi maskot "KoRa" (`src/assets/img/BonekaKoRa.jpg`, dikompres dari
-  ~1.5MB jadi ~40KB via `ffmpeg` supaya tidak membengkakkan bundle) yang
-  dipakai di Hero beranda.
+  `.pen` (diekspor ke PNG), lalu diganti pemilik proyek dengan ilustrasi
+  resmi maskot "KoRa" (`src/assets/img/BonekaKoRa-removebg.png`, transparan)
+  yang dipakai di Hero beranda dan ulasan interaktif modul.
 - **Salinan pemasaran baru** (bukan dari handoff, bebas diubah pemilik
   proyek): headline & subheadline Hero, eyebrow "Program Edukasi Transaksi
   Digital NTT", judul seksi modul "Belajar Transaksi Digital Lewat Praktik
@@ -132,11 +148,14 @@ src/
     kalkulator/       kalkulatorContent.js (data) + kalkulatorLogic.js (rumus, murni)
     keamanan/         keamananContent.js (3 skenario)
     kuis/             kuisContent.js (10 soal)
+    produklokal/      produkLokalContent.js (kartu tebak produk lokal)
   pages/              Beranda, Kalkulator, Keamanan, ProdukLokal, NotFound
   services/api.js     Lapisan fetch fire-and-forget ke backend
   hooks/useProductTour.js
   components/ProductTour.jsx
+  components/KoraNote.jsx  Ulasan KoRa (reaksi benar/salah + animasi)
   utils/format.js     formatRupiah, formatJam
+  utils/koraSound.js  Efek suara singkat KoRa (Web Audio API)
 ```
 
 Logika rumus (`kalkulatorLogic.js`) dan konten statis (`*Content.js`) sengaja
@@ -144,7 +163,7 @@ dipisah dari komponen UI supaya bisa ditest independen dari tampilan.
 
 ## Status pengujian
 
-`npm run test` → 8 file test, 27 test, semua lulus:
+`npm run test` → 15 file test, 47 test, semua lulus:
 
 - Rumus kalkulator (semua kombinasi omzet & waktu dari tabel handoff).
 - Eksklusivitas checklist "belum pernah mengalami" di P2.
@@ -159,8 +178,13 @@ dipisah dari komponen UI supaya bisa ditest independen dari tampilan.
 - Product tour di beranda (tampil di kunjungan pertama, langkah-langkahnya
   menyorot menu & kartu modul, hilang & tersimpan ke `localStorage` setelah
   dilewati, bisa dipanggil lagi lewat tombol "Lihat panduan lagi").
+- Animasi ulasan KoRa (reaksi, label, dan kelas warna berbeda untuk
+  jawaban benar/salah/netral; efek suara hanya untuk benar/salah, dan aman
+  bila Web Audio tidak tersedia).
+- Komponen feedback anonim dan cek pemahaman, plus kontrak URL/body
+  `submitFeedback` dan `submitPemahamanAttempt`.
 
-`npm run build` sukses (Vite + Tailwind v4 + HeroUI). Sudah diverifikasi
+`npm run build` sukses (Vite + Tailwind v4). Sudah diverifikasi
 manual di browser (beranda, wizard Kalkulator, skenario Keamanan) — tidak
 ada error di console.
 
