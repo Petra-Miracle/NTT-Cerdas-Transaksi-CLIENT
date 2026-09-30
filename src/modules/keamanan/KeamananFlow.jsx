@@ -2,12 +2,15 @@ import { ArrowRight, Bell, CircleCheck, CircleX, Phone, QrCode, ScanLine, Shield
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnswerCard from '../../components/AnswerCard'
+import KoraNote from '../../components/KoraNote'
 import ProgressDots from '../../components/ProgressDots'
 import { submitSkenarioAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
 import {
   HAK_KONSUMEN_DIGITAL,
   KANAL_PENGADUAN_RESMI,
+  KORA_PESAN_BENAR,
+  KORA_PESAN_SALAH,
   SKENARIO_LIST,
   SKENARIO_PESAN_BELUM_SEMPURNA,
   SKENARIO_PESAN_SEMPURNA,
@@ -173,6 +176,7 @@ function KeamananFlow() {
           <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">
             {opsi[state.selected].feedback}
           </p>
+          <KoraNote>{opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}</KoraNote>
           <button type="button" className="btn-primary-rust w-fit self-end" onClick={handleNext}>
             {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
             <ArrowRight size={16} aria-hidden="true" />

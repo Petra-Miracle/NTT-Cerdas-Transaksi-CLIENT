@@ -83,3 +83,10 @@ export const PRODUK_LOKAL_PESAN_SEMPURNA =
 
 export const PRODUK_LOKAL_PESAN_BELUM_SEMPURNA =
   'Yuk lebih peka lagi mengenali produk lokal di sekitarmu. Setiap kali kamu pilih produk buatan lokal/Indonesia — apalagi bayar pakai QRIS ke pedagangnya langsung — kamu sudah ikut membantu ekonomi UMKM.'
+
+// Pesan KoRa sebagai "teman belajar transaksi cerdas" — muncul kontekstual
+// setelah tiap kartu ditebak, bukan sekadar maskot dekoratif.
+export const KORA_PESAN_BENAR = 'Hebat! Kamu sudah lebih Cerdas Bertransaksi.'
+
+export const KORA_PESAN_SALAH =
+  'Coba lihat lagi ciri-cirinya — mana yang benar-benar produk lokal atau buatan Indonesia.'

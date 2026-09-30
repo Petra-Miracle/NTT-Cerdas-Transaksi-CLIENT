@@ -2,9 +2,16 @@ import { ArrowRight, CircleCheck, CircleX, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnswerCard from '../../components/AnswerCard'
+import KoraNote from '../../components/KoraNote'
 import ProgressDots from '../../components/ProgressDots'
 import { submitProdukLokalAttempt } from '../../services/api'
-import { KARTU_LIST, PRODUK_LOKAL_PESAN_BELUM_SEMPURNA, PRODUK_LOKAL_PESAN_SEMPURNA } from './produkLokalContent'
+import {
+  KARTU_LIST,
+  KORA_PESAN_BENAR,
+  KORA_PESAN_SALAH,
+  PRODUK_LOKAL_PESAN_BELUM_SEMPURNA,
+  PRODUK_LOKAL_PESAN_SEMPURNA,
+} from './produkLokalContent'
 
 const TOTAL = KARTU_LIST.length
 
@@ -121,6 +128,7 @@ function ProdukLokalFlow() {
             </p>
           </div>
           <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">{kartu.fakta}</p>
+          <KoraNote>{opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}</KoraNote>
           <button type="button" className="btn-primary w-fit self-end" onClick={handleNext}>
             {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Kartu Berikutnya'}
             <ArrowRight size={16} aria-hidden="true" />

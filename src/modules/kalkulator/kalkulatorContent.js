@@ -103,3 +103,7 @@ export const DISCLAIMER =
 export const BI_QRIS_URL = 'https://www.bi.go.id/QRIS'
 
 export const UPAH_PER_JAM = 15000
+
+// Pesan KoRa sebagai "teman belajar transaksi cerdas" — muncul setelah hasil
+// kalkulator selesai dihitung, bukan sekadar maskot dekoratif.
+export const KORA_PESAN_SELESAI = 'Hebat! Kamu sudah lebih Cerdas Bertransaksi.'

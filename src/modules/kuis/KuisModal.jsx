@@ -1,13 +1,14 @@
 import { ArrowRight, CircleCheck, CircleX, Repeat2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import AnswerCard from '../../components/AnswerCard'
+import KoraNote from '../../components/KoraNote'
 import Modal from '../../components/Modal'
 import ProductTour from '../../components/ProductTour'
 import ProgressDots from '../../components/ProgressDots'
 import { useProductTour } from '../../hooks/useProductTour'
 import { submitKuisAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
-import { getKuisMessage, KUIS_LIST } from './kuisContent'
+import { getKuisMessage, KORA_PESAN_BENAR, KORA_PESAN_SALAH, KUIS_LIST } from './kuisContent'
 
 const TOTAL = KUIS_LIST.length
 const TITLE_ID = 'kuis-modal-title'
@@ -139,6 +140,7 @@ function KuisModal({ isOpen, onClose }) {
                 </p>
               </div>
               <p className="text-[13px] leading-relaxed text-[var(--color-ink-on-bg-muted)]">{soal.penjelasan}</p>
+              <KoraNote>{opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}</KoraNote>
               <button type="button" className="btn-primary-sage w-fit self-end !px-6 !py-3" onClick={handleNext}>
                 {state.index === TOTAL - 1 ? 'Lihat skor' : 'Soal Berikutnya'}
                 <ArrowRight size={16} aria-hidden="true" />

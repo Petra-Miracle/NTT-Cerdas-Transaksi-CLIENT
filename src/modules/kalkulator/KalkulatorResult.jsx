@@ -1,8 +1,10 @@
 import { ArrowRight, Lightbulb, Receipt, Sparkles, TrendingDown, TrendingUp, X, Check } from 'lucide-react'
+import KoraNote from '../../components/KoraNote'
 import { formatJam, formatRupiah } from '../../utils/format'
 import {
   BI_QRIS_URL,
   DISCLAIMER,
+  KORA_PESAN_SELESAI,
   MANFAAT_UMUM,
   PENGALAMAN_INFO,
   PENGALAMAN_KOSONG_MESSAGE,
@@ -124,6 +126,8 @@ function KalkulatorResult({ answers, result, onReset }) {
           {REKOMENDASI[punyaRekening]}
         </p>
       </div>
+
+      <KoraNote>{KORA_PESAN_SELESAI}</KoraNote>
 
       <p className="text-center text-xs italic text-[var(--color-ink-on-bg-muted)]">{DISCLAIMER}</p>
 

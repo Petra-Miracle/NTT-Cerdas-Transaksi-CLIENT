@@ -108,3 +108,9 @@ export function getKuisMessage(percent) {
   if (percent >= 50) return 'Lumayan! Beberapa hal masih perlu diingat lagi — coba ulangi kuisnya.'
   return 'Yuk pelajari lagi ciri keaslian dan cara merawat uang rupiah supaya makin paham.'
 }
+
+// Pesan KoRa sebagai "teman belajar transaksi cerdas" — muncul kontekstual
+// setelah tiap soal dijawab, bukan sekadar maskot dekoratif.
+export const KORA_PESAN_BENAR = 'Hebat! Kamu sudah lebih Cerdas Bertransaksi.'
+
+export const KORA_PESAN_SALAH = 'Coba diingat lagi ciri-ciri keaslian dan cara merawat uang Rupiah, ya.'

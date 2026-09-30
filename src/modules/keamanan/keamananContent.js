@@ -122,6 +122,13 @@ export const HAK_KONSUMEN_DIGITAL = [
   },
 ]
 
+// Pesan KoRa sebagai "teman belajar transaksi cerdas" — muncul kontekstual
+// setelah tiap skenario dijawab, bukan sekadar maskot dekoratif.
+export const KORA_PESAN_BENAR = 'Hebat! Kamu sudah lebih Cerdas Bertransaksi.'
+
+export const KORA_PESAN_SALAH =
+  'Coba periksa kembali nominal dan identitas penerima sebelum melakukan pembayaran, ya.'
+
 export const KANAL_PENGADUAN_RESMI = [
   {
     nama: 'Bank Indonesia — BICARA',
