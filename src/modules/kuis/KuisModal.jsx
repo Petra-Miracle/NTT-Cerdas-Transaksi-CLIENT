@@ -125,21 +125,21 @@ function KuisModal({ isOpen, onClose }) {
           </div>
 
           {isAnswered && (
-            <div className="callout-slot flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+            <div className="callout-slot flex flex-col gap-3">
+              <div className="flex items-center gap-2.5">
                 {opsi[state.selected].benar ? (
-                  <CircleCheck size={16} className="text-[var(--color-sage)]" aria-hidden="true" />
+                  <CircleCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
                 ) : (
-                  <CircleX size={16} className="text-[var(--color-danger)]" aria-hidden="true" />
+                  <CircleX size={20} className="text-[var(--color-danger)]" aria-hidden="true" />
                 )}
                 <p
-                  className="text-sm font-bold"
+                  className="text-base font-bold"
                   style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
                 >
                   {opsi[state.selected].benar ? 'Tepat!' : 'Belum tepat'}
                 </p>
               </div>
-              <p className="text-[13px] leading-relaxed text-[var(--color-ink-on-bg-muted)]">{soal.penjelasan}</p>
+              <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">{soal.penjelasan}</p>
               <KoraNote>{opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}</KoraNote>
               <button type="button" className="btn-primary-sage w-fit self-end !px-6 !py-3" onClick={handleNext}>
                 {state.index === TOTAL - 1 ? 'Lihat skor' : 'Soal Berikutnya'}
