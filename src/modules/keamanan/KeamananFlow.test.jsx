@@ -22,30 +22,33 @@ describe('KeamananFlow', () => {
     vi.clearAllMocks()
   })
 
+  it('menampilkan skenario ringkas dan membuka alasan lengkap hanya saat diminta', async () => {
+    const user = userEvent.setup()
+    renderFlow()
+
+    expect(screen.getByText('Nama toko yang muncul berbeda dari nama tokomu. Apa yang kamu lakukan?')).toBeInTheDocument()
+    expect(screen.getByText('Lepas QR itu dan laporkan.')).toBeInTheDocument()
+    expect(screen.queryByText(/uang pembeli bisa masuk ke rekening orang itu/)).not.toBeInTheDocument()
+
+    await user.click(screen.getByText('Lepas QR itu dan laporkan.'))
+    expect(screen.getByText('QR statis palsu bisa mengalihkan uang ke rekening pelaku.')).toBeInTheDocument()
+    expect(screen.queryByText(/uang pembeli bisa masuk ke rekening orang itu/)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Kenapa?' }))
+    expect(screen.getByText(/uang pembeli bisa masuk ke rekening orang itu/)).toBeInTheDocument()
+  })
+
   it('menampilkan feedback lalu skor akhir 3/3 saat semua jawaban benar, dan mengirim analytics', async () => {
     const user = userEvent.setup()
     renderFlow()
 
-    await user.click(
-      screen.getByText(
-        'Cek sendiri nama yang muncul saat QR dipindai. Kalau memang beda dari nama tokomu, langsung lepas stiker QR itu dan laporkan.',
-      ),
-    )
+    await user.click(screen.getByText('Lepas QR itu dan laporkan.'))
     expect(screen.getByText('Tepat sekali!')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
-    await user.click(
-      screen.getByText(
-        'Tunggu sampai notifikasi transaksi resmi benar-benar muncul di HP atau rekeningmu sendiri, baru serahkan barangnya.',
-      ),
-    )
+    await user.click(screen.getByText('Tunggu notifikasi di HP-mu.'))
     await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
-    await user.click(
-      screen.getByText(
-        'Selalu cek nominal yang tertera di layar HP/EDC milikmu sendiri sebelum menyerahkan barang — jangan hanya percaya sebutan lisan pembeli.',
-      ),
-    )
+    await user.click(screen.getByText('Cek nominal di layarmu.'))
     await user.click(screen.getByRole('button', { name: 'Lihat hasil' }))
 
     expect(screen.getByText('3/3 jawaban tepat di percobaan pertama')).toBeInTheDocument()
@@ -57,14 +60,14 @@ describe('KeamananFlow', () => {
     const user = userEvent.setup()
     renderFlow()
 
-    await user.click(screen.getByText('Suruh dia lanjut transfer saja, mungkin cuma salah lihat.'))
+    await user.click(screen.getByText('Lanjutkan saja, mungkin salah lihat.'))
     expect(screen.getByText('Belum tepat')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
-    await user.click(screen.getByText('Percaya saja karena sudah lihat buktinya di layar HP pembeli, langsung kasih barangnya.'))
+    await user.click(screen.getByText('Berikan barang karena ada screenshot.'))
     await user.click(screen.getByRole('button', { name: 'Skenario Berikutnya' }))
 
-    await user.click(screen.getByText('Anggap wajar saja, karena QRIS dinamis biasanya otomatis benar nominalnya.'))
+    await user.click(screen.getByText('Percaya nominal yang disebut pembeli.'))
     await user.click(screen.getByRole('button', { name: 'Lihat hasil' }))
 
     expect(screen.getByText('0/3 jawaban tepat di percobaan pertama')).toBeInTheDocument()

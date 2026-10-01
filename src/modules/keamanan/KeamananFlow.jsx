@@ -16,16 +16,16 @@ import {
   KANAL_PENGADUAN_RESMI,
   KORA_PESAN_BENAR,
   KORA_PESAN_SALAH,
-  SKENARIO_LIST,
   SKENARIO_PESAN_BELUM_SEMPURNA,
   SKENARIO_PESAN_SEMPURNA,
 } from './keamananContent'
+import { SKENARIO_MICROCOPY } from './keamananMicrocopy'
 
-const TOTAL = SKENARIO_LIST.length
+const TOTAL = Object.keys(SKENARIO_MICROCOPY).length
 const SKENARIO_ICONS = [QrCode, Bell, ScanLine]
 
 function createInitialState() {
-  return { index: 0, selected: null, score: 0 }
+  return { index: 0, selected: null, score: 0, expanded: false }
 }
 
 function KeamananFlow() {
@@ -37,21 +37,20 @@ function KeamananFlow() {
   const [soundOn, setSoundOn] = useSoundLoop(startAction, stopAction, 0.4, { active: !selesai })
   useSoundLoop(startAmbient, stopAmbient, 0.4, { active: selesai && soundOn })
 
-  const skenario = SKENARIO_LIST[state.index]
+  const scenario = SKENARIO_MICROCOPY[state.index + 1]
   const ScenarioIcon = SKENARIO_ICONS[state.index]
   const isAnswered = state.selected !== null
-  const opsi = useMemo(() => shuffleArray(skenario.opsi), [skenario])
+  const opsi = useMemo(() => shuffleArray(scenario.opsi), [scenario])
 
   // Bacakan soal otomatis dengan suara perempuan tiap skenario dibuka.
-  // Rate sedikit cepat (1,15) karena teks skenario cukup panjang.
   useEffect(() => {
     if (selesai || !soundOn) return undefined
-    const timer = setTimeout(() => speakScenario(skenario.cerita, { rate: 1.15 }), 450)
+    const timer = setTimeout(() => speakScenario(scenario.cerita), 450)
     return () => {
       clearTimeout(timer)
       stopNarration()
     }
-  }, [state.index, selesai, soundOn, skenario.cerita])
+  }, [state.index, selesai, soundOn, scenario.cerita])
 
   useEffect(() => stopNarration, [])
 
@@ -59,7 +58,7 @@ function KeamananFlow() {
     if (isAnswered) return
     stopNarration()
     const benar = opsi[optionIndex].benar
-    setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0) }))
+    setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0), expanded: false }))
   }
 
   const handleNext = () => {
@@ -68,7 +67,7 @@ function KeamananFlow() {
       setSelesai(true)
       return
     }
-    setState((prev) => ({ ...prev, index: prev.index + 1, selected: null }))
+    setState((prev) => ({ ...prev, index: prev.index + 1, selected: null, expanded: false }))
   }
 
   const handleRestart = () => {
@@ -184,7 +183,7 @@ function KeamananFlow() {
               </p>
               <button
                 type="button"
-                onClick={() => speakScenario(skenario.cerita, { rate: 1.15 })}
+                onClick={() => speakScenario(scenario.cerita)}
                 className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-bold text-violet-800 transition hover:bg-violet-200"
                 aria-label="Dengarkan lagi soal ini"
               >
@@ -192,8 +191,9 @@ function KeamananFlow() {
                 Dengarkan
               </button>
             </div>
+            <p className="text-[13px] text-slate-500 italic">{scenario.konteks}</p>
             <p key={state.index} className="fade-scale-in text-[17px] leading-relaxed font-medium text-slate-900">
-              {skenario.cerita}
+              {scenario.cerita}
             </p>
           </div>
         </div>
@@ -236,6 +236,18 @@ function KeamananFlow() {
               {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
               <ArrowRight size={16} aria-hidden="true" />
             </button>
+            <div className="mt-1">
+              <button
+                type="button"
+                className="text-xs font-bold text-[#7C5CFF] underline underline-offset-2 hover:text-[#6847E8]"
+                onClick={() => setState((prev) => ({ ...prev, expanded: !prev.expanded }))}
+              >
+                {state.expanded ? 'Sembunyikan detail' : 'Kenapa?'}
+              </button>
+              {state.expanded && (
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">{opsi[state.selected].detail}</p>
+              )}
+            </div>
           </div>
         )}
       </div>

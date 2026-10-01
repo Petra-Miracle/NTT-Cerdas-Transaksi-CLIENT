@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { playKoraSound } from './koraSound'
 
+vi.mock('../assets/audio/kora-correct.mp3', () => ({ default: '/audio/kora-correct.mp3' }))
+vi.mock('../assets/audio/kora-incorrect.mp3', () => ({ default: '/audio/kora-incorrect.mp3' }))
+
 function createOscillatorMock() {
   return {
     type: '',

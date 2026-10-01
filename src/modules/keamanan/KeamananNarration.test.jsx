@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import KeamananFlow from './KeamananFlow'
-import { SKENARIO_LIST } from './keamananContent'
+import { SKENARIO_MICROCOPY } from './keamananMicrocopy'
 
 describe('KeamananFlow narasi soal', () => {
   beforeEach(() => {
@@ -42,8 +42,7 @@ describe('KeamananFlow narasi soal', () => {
     })
 
     expect(speak).toHaveBeenCalledOnce()
-    expect(utterances[0].text).toBe(SKENARIO_LIST[0].cerita)
+    expect(utterances[0].text).toBe(SKENARIO_MICROCOPY[1].cerita)
     expect(utterances[0].lang).toBe('id-ID')
-    expect(utterances[0].rate).toBeCloseTo(1.15)
   })
 })
