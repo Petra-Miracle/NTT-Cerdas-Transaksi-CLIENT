@@ -1,4 +1,4 @@
-import { ArrowRight, Bell, CircleCheck, CircleX, Phone, QrCode, ScanLine, ShieldCheck } from 'lucide-react'
+import { ArrowRight, CircleCheck, CircleX, Phone, ShieldCheck } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnswerCard from '../../components/AnswerCard'
@@ -6,36 +6,27 @@ import KoraNote from '../../components/KoraNote'
 import ProgressDots from '../../components/ProgressDots'
 import { submitSkenarioAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
-import {
-  HAK_KONSUMEN_DIGITAL,
-  KANAL_PENGADUAN_RESMI,
-  KORA_PESAN_BENAR,
-  KORA_PESAN_SALAH,
-  SKENARIO_LIST,
-  SKENARIO_PESAN_BELUM_SEMPURNA,
-  SKENARIO_PESAN_SEMPURNA,
-} from './keamananContent'
+import { HAK_KONSUMEN_DIGITAL, KANAL_PENGADUAN_RESMI, KORA_PESAN_BENAR, KORA_PESAN_SALAH } from './keamananContent'
+import { SKENARIO_MICROCOPY } from './keamananMicrocopy'
 
-const TOTAL = SKENARIO_LIST.length
-const SKENARIO_ICONS = [QrCode, Bell, ScanLine]
+const TOTAL = Object.keys(SKENARIO_MICROCOPY).length
 
 function createInitialState() {
-  return { index: 0, selected: null, score: 0 }
+  return { index: 0, selected: null, score: 0, expanded: false }
 }
 
 function KeamananFlow() {
   const [state, setState] = useState(createInitialState)
   const [selesai, setSelesai] = useState(false)
 
-  const skenario = SKENARIO_LIST[state.index]
-  const ScenarioIcon = SKENARIO_ICONS[state.index]
+  const scenario = SKENARIO_MICROCOPY[state.index + 1]
   const isAnswered = state.selected !== null
-  const opsi = useMemo(() => shuffleArray(skenario.opsi), [skenario])
+  const opsi = useMemo(() => shuffleArray(scenario.opsi), [scenario])
 
   const handleSelect = (optionIndex) => {
     if (isAnswered) return
     const benar = opsi[optionIndex].benar
-    setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0) }))
+    setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0), expanded: false }))
   }
 
   const handleNext = () => {
@@ -44,7 +35,7 @@ function KeamananFlow() {
       setSelesai(true)
       return
     }
-    setState((prev) => ({ ...prev, index: prev.index + 1, selected: null }))
+    setState((prev) => ({ ...prev, index: prev.index + 1, selected: null, expanded: false }))
   }
 
   const handleRestart = () => {
@@ -67,7 +58,7 @@ function KeamananFlow() {
             {state.score}/{TOTAL} jawaban tepat di percobaan pertama
           </p>
           <p className="max-w-md text-[var(--color-ink-on-bg-muted)]">
-            {sempurna ? SKENARIO_PESAN_SEMPURNA : SKENARIO_PESAN_BELUM_SEMPURNA}
+            {sempurna ? 'Mantap, semua jawabanmu tepat di percobaan pertama! Kamu sudah paham tiga situasi keamanan QRIS yang paling sering dialami pedagang.' : 'Terus diingat ya: selalu cek nama toko saat QR dipindai, tunggu notifikasi resmi di perangkatmu sendiri, dan selalu lihat nominal di layarmu sebelum menyerahkan barang.'}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" className="btn-primary-rust" onClick={handleRestart}>
@@ -79,10 +70,7 @@ function KeamananFlow() {
           </div>
         </div>
 
-        <div
-          className="panel-glow panel-glow-neutral flex w-full flex-col gap-6 p-6 text-left sm:p-10"
-          data-testid="perlindungan-konsumen"
-        >
+        <div className="panel-glow panel-glow-neutral flex w-full flex-col gap-6 p-6 text-left sm:p-10" data-testid="perlindungan-konsumen">
           <div className="flex items-center gap-2.5">
             <span className="icon-chip h-10 w-10 border-none bg-white/10">
               <ShieldCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
@@ -126,22 +114,19 @@ function KeamananFlow() {
   }
 
   return (
-    <div
-      className="panel-glow panel-glow-rust mx-auto flex w-full flex-col gap-8 p-6 sm:p-12"
-      data-testid="skenario-panel"
-      data-tour="keamanan-panel"
-    >
+    <div className="panel-glow panel-glow-rust mx-auto flex w-full flex-col gap-8 p-6 sm:p-12" data-testid="skenario-panel" data-tour="keamanan-panel">
       <ProgressDots total={TOTAL} current={state.index} accent="rust" />
 
       <div className="flex items-start gap-5">
         <span className="icon-chip h-14 w-14 border-none bg-black">
-          <ScenarioIcon size={26} className="text-[var(--color-rust)]" aria-hidden="true" />
+          {/* keep icon for step if needed; fallback to generic shield */}
+          <ShieldCheck size={26} className="text-[var(--color-rust)]" aria-hidden="true" />
         </span>
         <div className="flex flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-rust)] uppercase">
             Skenario {state.index + 1} dari {TOTAL}
           </p>
-          <p className="text-[17px] leading-relaxed font-medium text-white">{skenario.cerita}</p>
+          <p className="text-[17px] leading-relaxed font-medium text-white">{scenario.cerita}</p>
         </div>
       </div>
 
@@ -166,10 +151,7 @@ function KeamananFlow() {
             ) : (
               <CircleX size={20} className="text-[var(--color-danger)]" aria-hidden="true" />
             )}
-            <p
-              className="text-base font-bold"
-              style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}
-            >
+            <p className="text-base font-bold" style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}>
               {opsi[state.selected].benar ? 'Tepat sekali!' : 'Belum tepat'}
             </p>
           </div>
@@ -183,6 +165,16 @@ function KeamananFlow() {
             {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
             <ArrowRight size={16} aria-hidden="true" />
           </button>
+          <div className="mt-2">
+            <button type="button" className="text-xs font-medium text-[var(--color-ink-on-bg-muted)] underline" onClick={() => setState((prev) => ({ ...prev, expanded: !prev.expanded }))}>
+              {state.expanded ? 'Sembunyikan detail' : 'Kenapa?'}
+            </button>
+            {state.expanded && (
+              <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)] mt-1">
+                {opsi[state.selected].detail}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
