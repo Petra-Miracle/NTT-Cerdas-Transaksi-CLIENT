@@ -1,9 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { QUESTIONS } from './kalkulatorContent'
 import KalkulatorWizard from './KalkulatorWizard'
 
 describe('KalkulatorWizard', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
   it('tidak bisa lanjut tanpa menjawab, lalu menyelesaikan seluruh wizard', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
@@ -54,5 +59,34 @@ describe('KalkulatorWizard', () => {
     expect(screen.getByText(/Pernahkah kamu mengalami/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Sebelumnya' }))
     expect(screen.getByLabelText('Kurang dari Rp100.000')).toBeChecked()
+  })
+
+  it('membacakan pertanyaan dengan suara perempuan tiap langkah dibuka', async () => {
+    vi.useFakeTimers()
+    const speak = vi.fn()
+    const cancel = vi.fn()
+    const utterances = []
+    class UtteranceMock {
+      constructor(text) {
+        this.text = text
+        utterances.push(this)
+      }
+    }
+    vi.stubGlobal('speechSynthesis', {
+      speak,
+      cancel,
+      getVoices: () => [{ name: 'Wanita Indonesia', lang: 'id-ID' }],
+    })
+    vi.stubGlobal('SpeechSynthesisUtterance', UtteranceMock)
+
+    render(<KalkulatorWizard onComplete={vi.fn()} />)
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500)
+    })
+
+    expect(speak).toHaveBeenCalledOnce()
+    expect(utterances[0].text).toBe(QUESTIONS.omzet)
+    expect(utterances[0].lang).toBe('id-ID')
   })
 })

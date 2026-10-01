@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
-function Modal({ isOpen, onClose, titleId, panelClassName, children }) {
+function Modal({ isOpen, onClose, titleId, panelClassName, backdropClassName, children }) {
   const dialogRef = useRef(null)
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function Modal({ isOpen, onClose, titleId, panelClassName, children }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#05070C]/60 p-4"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${backdropClassName ?? 'bg-[#05070C]/60'}`}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
@@ -70,7 +70,7 @@ function Modal({ isOpen, onClose, titleId, panelClassName, children }) {
           type="button"
           onClick={onClose}
           aria-label="Tutup"
-          className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition hover:bg-white/10 hover:text-white"
+          className="absolute top-5 right-5 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white/70 text-slate-500 transition hover:bg-rose-100 hover:text-slate-800"
         >
           <X size={15} aria-hidden="true" />
         </button>

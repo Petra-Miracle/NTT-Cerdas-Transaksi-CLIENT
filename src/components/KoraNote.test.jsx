@@ -57,4 +57,19 @@ describe('KoraNote', () => {
     expect(screen.getByRole('status')).toHaveAttribute('data-outcome', 'neutral')
     expect(screen.getByAltText('Maskot KoRa')).toHaveClass('mascot-float')
   })
+
+  it('memakai tone terang yang terbaca di atas latar putih', () => {
+    const { rerender } = render(<KoraNote tone="light">Pesan penutup.</KoraNote>)
+
+    expect(screen.getByRole('status')).toHaveClass('kora-tone-light')
+    expect(screen.getByRole('status')).toHaveClass('bg-orange-50')
+
+    rerender(
+      <KoraNote tone="light" outcome="correct">
+        Benar.
+      </KoraNote>,
+    )
+    expect(screen.getByRole('status')).toHaveClass('kora-tone-light')
+    expect(screen.getByRole('status')).toHaveClass('kora-review-correct')
+  })
 })

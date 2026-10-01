@@ -1,15 +1,28 @@
-import { ArrowRight, CircleCheck, CircleX, Phone, ShieldCheck } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ArrowRight, Bell, CircleCheck, CircleX, Phone, QrCode, ScanLine, ShieldCheck, Volume2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import AmbientToggle from '../../components/AmbientToggle'
 import AnswerCard from '../../components/AnswerCard'
 import KoraNote from '../../components/KoraNote'
 import ProgressDots from '../../components/ProgressDots'
+import { useSoundLoop } from '../../hooks/useSoundLoop'
+import { startAmbient, stopAmbient } from '../../utils/ambientSound'
+import { startAction, stopAction } from '../../utils/actionSound'
+import { speakScenario, stopNarration } from '../../utils/narration'
 import { submitSkenarioAttempt } from '../../services/api'
 import { shuffleArray } from '../../utils/shuffle'
-import { HAK_KONSUMEN_DIGITAL, KANAL_PENGADUAN_RESMI, KORA_PESAN_BENAR, KORA_PESAN_SALAH } from './keamananContent'
+import {
+  HAK_KONSUMEN_DIGITAL,
+  KANAL_PENGADUAN_RESMI,
+  KORA_PESAN_BENAR,
+  KORA_PESAN_SALAH,
+  SKENARIO_PESAN_BELUM_SEMPURNA,
+  SKENARIO_PESAN_SEMPURNA,
+} from './keamananContent'
 import { SKENARIO_MICROCOPY } from './keamananMicrocopy'
 
 const TOTAL = Object.keys(SKENARIO_MICROCOPY).length
+const SKENARIO_ICONS = [QrCode, Bell, ScanLine]
 
 function createInitialState() {
   return { index: 0, selected: null, score: 0, expanded: false }
@@ -19,12 +32,31 @@ function KeamananFlow() {
   const [state, setState] = useState(createInitialState)
   const [selesai, setSelesai] = useState(false)
 
+  // Mode jawab: loop tegang ala kasus penipuan beneran. Mode hasil: musik
+  // ceria lagi. Keduanya 40%.
+  const [soundOn, setSoundOn] = useSoundLoop(startAction, stopAction, 0.4, { active: !selesai })
+  useSoundLoop(startAmbient, stopAmbient, 0.4, { active: selesai && soundOn })
+
   const scenario = SKENARIO_MICROCOPY[state.index + 1]
+  const ScenarioIcon = SKENARIO_ICONS[state.index]
   const isAnswered = state.selected !== null
   const opsi = useMemo(() => shuffleArray(scenario.opsi), [scenario])
 
+  // Bacakan soal otomatis dengan suara perempuan tiap skenario dibuka.
+  useEffect(() => {
+    if (selesai || !soundOn) return undefined
+    const timer = setTimeout(() => speakScenario(scenario.cerita), 450)
+    return () => {
+      clearTimeout(timer)
+      stopNarration()
+    }
+  }, [state.index, selesai, soundOn, scenario.cerita])
+
+  useEffect(() => stopNarration, [])
+
   const handleSelect = (optionIndex) => {
     if (isAnswered) return
+    stopNarration()
     const benar = opsi[optionIndex].benar
     setState((prev) => ({ ...prev, selected: optionIndex, score: prev.score + (benar ? 1 : 0), expanded: false }))
   }
@@ -39,145 +71,189 @@ function KeamananFlow() {
   }
 
   const handleRestart = () => {
+    stopNarration()
     setState(createInitialState())
     setSelesai(false)
+  }
+
+  const toggleSound = () => {
+    stopNarration()
+    setSoundOn((prev) => !prev)
   }
 
   if (selesai) {
     const sempurna = state.score === TOTAL
     return (
-      <div className="mx-auto flex w-full flex-col gap-6">
-        <div
-          className="panel-glow panel-glow-rust flex w-full flex-col items-center gap-6 p-6 text-center sm:p-12"
-          data-testid="skenario-selesai"
-        >
-          <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-on-bg-muted)] uppercase">
-            Hasil kamu
-          </p>
-          <p className="text-4xl font-bold text-white">
-            {state.score}/{TOTAL} jawaban tepat di percobaan pertama
-          </p>
-          <p className="max-w-md text-[var(--color-ink-on-bg-muted)]">
-            {sempurna ? 'Mantap, semua jawabanmu tepat di percobaan pertama! Kamu sudah paham tiga situasi keamanan QRIS yang paling sering dialami pedagang.' : 'Terus diingat ya: selalu cek nama toko saat QR dipindai, tunggu notifikasi resmi di perangkatmu sendiri, dan selalu lihat nominal di layarmu sebelum menyerahkan barang.'}
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button type="button" className="btn-primary-rust" onClick={handleRestart}>
-              ↻ Ulangi
-            </button>
-            <Link to="/" className="btn-ghost">
-              Kembali ke beranda
-            </Link>
-          </div>
-        </div>
-
-        <div className="panel-glow panel-glow-neutral flex w-full flex-col gap-6 p-6 text-left sm:p-10" data-testid="perlindungan-konsumen">
-          <div className="flex items-center gap-2.5">
-            <span className="icon-chip h-10 w-10 border-none bg-white/10">
-              <ShieldCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
-            </span>
-            <h3 className="text-lg font-bold text-white">Kamu Punya Hak sebagai Konsumen Digital</h3>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {HAK_KONSUMEN_DIGITAL.map((hak) => (
-              <div key={hak.judul} className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <p className="text-sm font-semibold text-white">{hak.judul}</p>
-                <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">{hak.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-3 border-t border-white/10 pt-5">
-            <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-on-bg-muted)] uppercase">
-              Merasa dirugikan? Ini kanal pengaduan resminya
+      <>
+        <div className="mx-auto flex w-full flex-col gap-6">
+          <div
+            className="flex w-full flex-col items-center gap-6 rounded-[28px] border border-violet-100 bg-white/95 p-6 text-center shadow-xl shadow-violet-200/50 backdrop-blur-sm sm:p-12"
+            data-testid="skenario-selesai"
+          >
+            <p className="text-xs font-black tracking-widest text-[#7C5CFF] uppercase">Hasil kamu</p>
+            <p className="number-pop text-4xl font-black tracking-tight text-slate-900">
+              {state.score}/{TOTAL} jawaban tepat di percobaan pertama
             </p>
-            {KANAL_PENGADUAN_RESMI.map((kanal) => (
-              <div key={kanal.nama} className="flex items-start gap-3">
-                <span className="icon-chip h-9 w-9 shrink-0 border-none bg-white/10">
-                  <Phone size={16} className="text-[var(--color-ochre)]" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold text-white">
-                    {kanal.nama} · <span className="text-[var(--color-ochre)]">{kanal.kontak}</span>
-                  </p>
-                  <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">{kanal.desc}</p>
+            <p className="max-w-md text-slate-600">
+              {sempurna ? SKENARIO_PESAN_SEMPURNA : SKENARIO_PESAN_BELUM_SEMPURNA}
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#7C5CFF] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/30 transition hover:bg-[#6847E8]"
+                onClick={handleRestart}
+              >
+                ↻ Ulangi
+              </button>
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-violet-200 bg-white px-6 py-3 text-sm font-bold text-violet-800 transition hover:border-violet-300 hover:bg-violet-50"
+              >
+                Kembali ke beranda
+              </Link>
+            </div>
+          </div>
+
+          <div
+            className="flex w-full flex-col gap-6 rounded-[28px] border border-violet-100 bg-white/95 p-6 text-left shadow-xl shadow-violet-200/50 backdrop-blur-sm sm:p-10"
+            data-testid="perlindungan-konsumen"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100">
+                <ShieldCheck size={20} className="text-emerald-600" aria-hidden="true" />
+              </span>
+              <h3 className="text-lg font-bold text-slate-900">Kamu Punya Hak sebagai Konsumen Digital</h3>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {HAK_KONSUMEN_DIGITAL.map((hak) => (
+                <div key={hak.judul} className="flex flex-col gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-4">
+                  <p className="text-sm font-semibold text-slate-900">{hak.judul}</p>
+                  <p className="text-xs leading-relaxed text-slate-600">{hak.desc}</p>
                 </div>
-              </div>
-            ))}
-            <p className="text-[11px] italic text-[var(--color-ink-on-bg-muted)]">
-              Bisa juga hubungi langsung bank atau penyedia QRIS yang kamu pakai untuk kasus yang lebih spesifik.
-            </p>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-violet-100 pt-5">
+              <p className="text-xs font-black tracking-widest text-slate-500 uppercase">
+                Merasa dirugikan? Ini kanal pengaduan resminya
+              </p>
+              {KANAL_PENGADUAN_RESMI.map((kanal) => (
+                <div key={kanal.nama} className="flex items-start gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-100">
+                    <Phone size={16} className="text-[#E8590C]" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {kanal.nama} · <span className="text-[#E8590C]">{kanal.kontak}</span>
+                    </p>
+                    <p className="text-xs leading-relaxed text-slate-600">{kanal.desc}</p>
+                  </div>
+                </div>
+              ))}
+              <p className="text-[11px] text-slate-500 italic">
+                Bisa juga hubungi langsung bank atau penyedia QRIS yang kamu pakai untuk kasus yang lebih spesifik.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+
+        <AmbientToggle on={soundOn} onToggle={toggleSound} />
+      </>
     )
   }
 
   return (
-    <div className="panel-glow panel-glow-rust mx-auto flex w-full flex-col gap-8 p-6 sm:p-12" data-testid="skenario-panel" data-tour="keamanan-panel">
-      <ProgressDots total={TOTAL} current={state.index} accent="rust" />
+    <>
+      <div
+        className="mx-auto flex w-full flex-col gap-8 rounded-[28px] border border-violet-100 bg-white/95 p-6 shadow-xl shadow-violet-200/50 backdrop-blur-sm sm:p-12"
+        data-testid="skenario-panel"
+        data-tour="keamanan-panel"
+      >
+        <ProgressDots total={TOTAL} current={state.index} accent="ungu" tone="light" />
 
-      <div className="flex items-start gap-5">
-        <span className="icon-chip h-14 w-14 border-none bg-black">
-          {/* keep icon for step if needed; fallback to generic shield */}
-          <ShieldCheck size={26} className="text-[var(--color-rust)]" aria-hidden="true" />
-        </span>
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-semibold tracking-wide text-[var(--color-rust)] uppercase">
-            Skenario {state.index + 1} dari {TOTAL}
-          </p>
-          <p className="text-[17px] leading-relaxed font-medium text-white">{scenario.cerita}</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {opsi.map((item, index) => (
-          <AnswerCard
-            key={item.label}
-            label={item.label}
-            isAnswered={isAnswered}
-            isSelected={state.selected === index}
-            isCorrect={isAnswered && item.benar}
-            onClick={() => handleSelect(index)}
-          />
-        ))}
-      </div>
-
-      {isAnswered && (
-        <div className="callout-slot flex flex-col gap-3">
-          <div className="flex items-center gap-2.5">
-            {opsi[state.selected].benar ? (
-              <CircleCheck size={20} className="text-[var(--color-sage)]" aria-hidden="true" />
-            ) : (
-              <CircleX size={20} className="text-[var(--color-danger)]" aria-hidden="true" />
-            )}
-            <p className="text-base font-bold" style={{ color: opsi[state.selected].benar ? 'var(--color-sage)' : 'var(--color-danger)' }}>
-              {opsi[state.selected].benar ? 'Tepat sekali!' : 'Belum tepat'}
+        <div className="flex items-start gap-5">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#7C5CFF] shadow-lg shadow-violet-500/30">
+            <ScenarioIcon size={26} className="text-white" aria-hidden="true" />
+          </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-black tracking-widest text-[#7C5CFF] uppercase">
+                Skenario {state.index + 1} dari {TOTAL}
+              </p>
+              <button
+                type="button"
+                onClick={() => speakScenario(scenario.cerita)}
+                className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-bold text-violet-800 transition hover:bg-violet-200"
+                aria-label="Dengarkan lagi soal ini"
+              >
+                <Volume2 size={12} aria-hidden="true" />
+                Dengarkan
+              </button>
+            </div>
+            <p className="text-[13px] text-slate-500 italic">{scenario.konteks}</p>
+            <p key={state.index} className="fade-scale-in text-[17px] leading-relaxed font-medium text-slate-900">
+              {scenario.cerita}
             </p>
           </div>
-          <p className="text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">
-            {opsi[state.selected].feedback}
-          </p>
-          <KoraNote outcome={opsi[state.selected].benar ? 'correct' : 'incorrect'}>
-            {opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}
-          </KoraNote>
-          <button type="button" className="btn-primary-rust w-fit self-end" onClick={handleNext}>
-            {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
-            <ArrowRight size={16} aria-hidden="true" />
-          </button>
-          <div className="mt-2">
-            <button type="button" className="text-xs font-medium text-[var(--color-ink-on-bg-muted)] underline" onClick={() => setState((prev) => ({ ...prev, expanded: !prev.expanded }))}>
-              {state.expanded ? 'Sembunyikan detail' : 'Kenapa?'}
-            </button>
-            {state.expanded && (
-              <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)] mt-1">
-                {opsi[state.selected].detail}
-              </p>
-            )}
-          </div>
         </div>
-      )}
-    </div>
+
+        <div className="flex flex-col gap-3">
+          {opsi.map((item, index) => (
+            <AnswerCard
+              key={item.label}
+              tone="light"
+              label={item.label}
+              isAnswered={isAnswered}
+              isSelected={state.selected === index}
+              isCorrect={isAnswered && item.benar}
+              onClick={() => handleSelect(index)}
+            />
+          ))}
+        </div>
+
+        {isAnswered && (
+          <div className="fade-scale-in flex flex-col gap-3 rounded-2xl border border-violet-100 bg-violet-50/70 p-5">
+            <div className="flex items-center gap-2.5">
+              {opsi[state.selected].benar ? (
+                <CircleCheck size={20} className="text-emerald-600" aria-hidden="true" />
+              ) : (
+                <CircleX size={20} className="text-red-500" aria-hidden="true" />
+              )}
+              <p className={`text-base font-bold ${opsi[state.selected].benar ? 'text-emerald-700' : 'text-red-600'}`}>
+                {opsi[state.selected].benar ? 'Tepat sekali!' : 'Belum tepat'}
+              </p>
+            </div>
+            <p className="text-sm leading-relaxed text-slate-600">{opsi[state.selected].feedback}</p>
+            <KoraNote tone="light" outcome={opsi[state.selected].benar ? 'correct' : 'incorrect'}>
+              {opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}
+            </KoraNote>
+            <button
+              type="button"
+              className="inline-flex w-fit items-center justify-center gap-2 self-end rounded-full bg-[#7C5CFF] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/30 transition hover:bg-[#6847E8]"
+              onClick={handleNext}
+            >
+              {state.index === TOTAL - 1 ? 'Lihat hasil' : 'Skenario Berikutnya'}
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+            <div className="mt-1">
+              <button
+                type="button"
+                className="text-xs font-bold text-[#7C5CFF] underline underline-offset-2 hover:text-[#6847E8]"
+                onClick={() => setState((prev) => ({ ...prev, expanded: !prev.expanded }))}
+              >
+                {state.expanded ? 'Sembunyikan detail' : 'Kenapa?'}
+              </button>
+              {state.expanded && (
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">{opsi[state.selected].detail}</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <AmbientToggle on={soundOn} onToggle={toggleSound} />
+    </>
   )
 }
 
