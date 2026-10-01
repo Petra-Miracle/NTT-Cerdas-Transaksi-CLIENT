@@ -105,6 +105,12 @@
     background: radial-gradient(140% 180% at 50% -20%, #1c2a3a 0%, #0d141c 55%, #060a0f 100%);
   }
 
+  /* Panel terang kuis (putih-merah muda). */
+  .kuis-panel-light {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+  }
+
   .panel-glow-ochre {
     background: radial-gradient(140% 180% at 50% -20%, #3a2f1a 0%, #1c150d 55%, #0d0904 100%);
   }
@@ -160,8 +166,191 @@
     @apply flex shrink-0 items-center justify-center rounded-xl border;
   }
 
-  /* Kalkulator wizard option cards: bordered glass card + custom
-     radio/checkbox indicator, indigo accent when selected. */
+  /* Kalkulator (terang, putih-oranye): kartu opsi terang + indikator oranye. */
+  .option-card-light {
+    @apply relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border-2 border-orange-200 bg-white px-5 py-[18px] text-left text-sm font-medium text-slate-800 shadow-sm transition;
+  }
+
+  .option-card-light:hover {
+    @apply border-orange-300 bg-orange-50;
+  }
+
+  .option-card-light[data-selected="true"] {
+    border-color: #e8590c;
+    background: #fff7ed;
+    box-shadow: 0 10px 22px -10px rgb(232 89 12 / 0.4);
+  }
+
+  .option-indicator-light {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-orange-300 bg-white;
+  }
+
+  .option-indicator-light[data-shape="square"] {
+    @apply rounded-md;
+  }
+
+  .option-indicator-light[data-checked="true"] {
+    border-color: #e8590c;
+  }
+
+  .option-dot-light {
+    @apply h-2.5 w-2.5 rounded-full;
+    background: #e8590c;
+  }
+
+  /* Kartu jawaban terang (ungu, modul Keamanan): tint tegas agar terbaca. */
+  .answer-card-light {
+    @apply relative flex w-full items-center gap-3 rounded-2xl border-2 border-violet-200 bg-white px-[18px] py-3.5 text-left text-sm font-medium text-slate-800 shadow-sm transition;
+  }
+
+  .answer-card-light:hover:not(:disabled) {
+    @apply border-violet-300 bg-violet-50;
+  }
+
+  .answer-card-light[data-correct="true"] {
+    border-color: #059669;
+    background: #ecfdf5;
+    box-shadow: 0 10px 22px -10px rgb(5 150 105 / 0.4);
+  }
+
+  .answer-card-light[data-incorrect="true"] {
+    border-color: #ef4444;
+    background: #fef2f2;
+    box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
+  }
+
+  .answer-card-light[data-disabled="true"] {
+    @apply pointer-events-none opacity-45;
+  }
+
+  .answer-indicator-light {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-violet-300 bg-white;
+  }
+
+  /* Kartu jawaban merah-muda (modul Kuis). */
+  .answer-card-rose {
+    @apply relative flex w-full items-center gap-3 rounded-2xl border-2 border-rose-200 bg-white px-[18px] py-3.5 text-left text-sm font-medium text-slate-800 shadow-sm transition;
+  }
+
+  .answer-card-rose:hover:not(:disabled) {
+    @apply border-rose-300 bg-rose-50;
+  }
+
+  .answer-card-rose[data-correct="true"] {
+    border-color: #059669;
+    background: #ecfdf5;
+    box-shadow: 0 10px 22px -10px rgb(5 150 105 / 0.4);
+  }
+
+  .answer-card-rose[data-incorrect="true"] {
+    border-color: #ef4444;
+    background: #fef2f2;
+    box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
+  }
+
+  .answer-card-rose[data-disabled="true"] {
+    @apply pointer-events-none opacity-45;
+  }
+
+  .answer-indicator-rose {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-rose-300 bg-white;
+  }
+
+  /* Kartu jawaban biru tua (modul Produk Lokal). */
+  .answer-card-biru {
+    @apply relative flex w-full items-center gap-3 rounded-2xl border-2 border-blue-200 bg-white px-[18px] py-3.5 text-left text-sm font-medium text-slate-800 shadow-sm transition;
+  }
+
+  .answer-card-biru:hover:not(:disabled) {
+    @apply border-blue-300 bg-blue-50;
+  }
+
+  .answer-card-biru[data-correct="true"] {
+    border-color: #059669;
+    background: #ecfdf5;
+    box-shadow: 0 10px 22px -10px rgb(5 150 105 / 0.4);
+  }
+
+  .answer-card-biru[data-incorrect="true"] {
+    border-color: #ef4444;
+    background: #fef2f2;
+    box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
+  }
+
+  .answer-card-biru[data-disabled="true"] {
+    @apply pointer-events-none opacity-45;
+  }
+
+  .answer-indicator-biru {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-blue-300 bg-white;
+  }
+  .progress-light .progress-dot {
+    background-color: color-mix(in srgb, var(--dot-accent, #e8590c) 22%, white);
+  }
+
+  .progress-light .progress-dot[data-state="current"] {
+    background-color: var(--dot-accent, #e8590c);
+  }
+
+  /* Latar pasar: melayang pelan. Hujan koin + angka pop untuk hasil kalkulator. */
+  .pasar-drift {
+    animation: pasar-drift 10s ease-in-out infinite;
+  }
+
+  .coin-rain {
+    animation-name: coin-rain;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .number-pop {
+    animation: number-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Nominal rupiah melayang + titik hujan untuk hasil kuis. */
+  .rupiah-float {
+    animation: rupiah-float 12s ease-in-out infinite;
+  }
+
+  .progress-light .progress-dot-flat {
+    background-color: color-mix(in srgb, var(--dot-accent, #e11d48) 25%, white);
+  }
+
+  .progress-light .progress-dot-flat[data-state="current"] {
+    background-color: white;
+    outline: 2px solid var(--dot-accent, #e11d48);
+  }
+
+  .progress-light .progress-dot-flat[data-state="done"] {
+    background-color: var(--dot-accent, #e11d48);
+  }
+
+  .rain-drop {
+    animation: rain-fall 1.1s ease-in infinite;
+  }
+
+  /* Tenun 3D: panggung perspektif + kain bergoyang + benang melayang. */
+  .tenun-stage {
+    perspective: 900px;
+  }
+
+  .tenun-layer {
+    transform-style: preserve-3d;
+    animation: tenun-sway 9s ease-in-out infinite;
+  }
+
+  .tenun-float {
+    animation: tenun-float 5s ease-in-out infinite;
+  }
+
+  /* Kartu produk: goyang saat salah, berpendar saat benar. */
+  .card-shake {
+    animation: card-shake 0.5s ease-in-out;
+  }
+
+  .card-glow-correct {
+    animation: card-glow 0.6s ease-out;
+  }
   .option-card {
     @apply relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border border-white/30 bg-white/[0.03] px-5 py-[18px] text-left text-sm text-[var(--color-ink-on-bg)] transition;
   }
@@ -271,6 +460,25 @@
 
   .kora-review-incorrect-label {
     color: var(--color-kora-incorrect);
+  }
+
+  /* KoraNote di atas latar terang: tint lebih pekat + teks gelap. */
+  .kora-tone-light.kora-review-correct {
+    border-color: color-mix(in srgb, var(--color-kora-correct) 55%, #047857);
+    background-color: color-mix(in srgb, var(--color-kora-correct) 25%, white);
+  }
+
+  .kora-tone-light .kora-review-correct-label {
+    color: #047857;
+  }
+
+  .kora-tone-light.kora-review-incorrect {
+    border-color: color-mix(in srgb, var(--color-kora-incorrect) 60%, #92400e);
+    background-color: color-mix(in srgb, var(--color-kora-incorrect) 30%, white);
+  }
+
+  .kora-tone-light .kora-review-incorrect-label {
+    color: #9a3412;
   }
 
   .kora-bounce-correct {
@@ -412,6 +620,156 @@
   45% { transform: rotate(-8deg); }
   60% { transform: rotate(6deg); }
   75% { transform: rotate(-4deg); }
+}
+
+/* ModuleLaunch — KoRa terbang masuk menembus kabut, tombol Play berdenyut,
+   lalu ledakan kabut sebagai transisi masuk modul. */
+.launch-card {
+  animation: launch-pop 0.35s ease-out both;
+}
+
+.kora-fly {
+  animation: kora-fly-in 1.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.launch-runway {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 34px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%), transparent);
+}
+
+.mist-cloud {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(46px);
+  background: rgb(180 205 240 / 22%);
+  animation: mist-drift 5s ease-in-out infinite;
+}
+
+.mist-a {
+  width: 340px;
+  height: 130px;
+  top: 12%;
+  left: -90px;
+}
+
+.mist-b {
+  width: 420px;
+  height: 150px;
+  bottom: 8%;
+  right: -110px;
+  animation-delay: -1.6s;
+  background: rgb(255 208 47 / 14%);
+}
+
+.mist-c {
+  width: 260px;
+  height: 110px;
+  top: 44%;
+  left: 38%;
+  animation-delay: -3.1s;
+}
+
+.play-btn .play-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgb(21 51 95 / 35%);
+  animation: play-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.mist-blast {
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 30% 40%, rgb(255 255 255 / 95%) 0%, transparent 42%),
+    radial-gradient(circle at 70% 60%, rgb(214 228 248 / 95%) 0%, transparent 46%),
+    radial-gradient(circle at 50% 50%, rgb(255 255 255 / 90%) 0%, transparent 60%);
+  filter: blur(10px);
+  animation: mist-blast-in 0.68s ease-out both;
+}
+
+@keyframes launch-pop {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes kora-fly-in {
+  0% { transform: translateX(-46vw) translateY(26px) rotate(-14deg) scale(0.7); opacity: 0; }
+  18% { opacity: 1; }
+  60% { transform: translateX(6vw) translateY(-12px) rotate(6deg) scale(1.04); }
+  100% { transform: translateX(0) translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes mist-drift {
+  0%, 100% { transform: translateX(0); opacity: 0.75; }
+  50% { transform: translateX(56px); opacity: 1; }
+}
+
+@keyframes play-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  80%, 100% { transform: scale(1.65); opacity: 0; }
+}
+
+@keyframes mist-blast-in {
+  0% { opacity: 0; transform: scale(0.55); }
+  45% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+@keyframes pasar-drift {
+  0%, 100% { transform: translateY(0) scale(1.02); }
+  50% { transform: translateY(-14px) scale(1.05); }
+}
+
+@keyframes coin-rain {
+  0% { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  100% { transform: translateY(112vh) rotate(340deg); opacity: 0.85; }
+}
+
+@keyframes number-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes rupiah-float {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-22px) rotate(5deg); }
+}
+
+@keyframes rain-fall {
+  0% { transform: translateY(-4px); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(16px); opacity: 0; }
+}
+
+@keyframes tenun-sway {
+  0%, 100% { transform: rotateX(8deg) rotateY(-10deg) translateZ(0); }
+  50% { transform: rotateX(-6deg) rotateY(10deg) translateZ(46px); }
+}
+
+@keyframes tenun-float {
+  0%, 100% { transform: translateY(0) rotate(45deg); opacity: 0.5; }
+  50% { transform: translateY(-18px) rotate(135deg); opacity: 1; }
+}
+
+@keyframes card-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes card-glow {
+  0% { box-shadow: 0 0 0 0 rgb(5 150 105 / 0.55); }
+  100% { box-shadow: 0 0 0 20px transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {
