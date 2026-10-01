@@ -1,7 +1,8 @@
-import { ArrowRight, CheckCircle, ShieldAlert } from 'lucide-react'
+import { Alert, Button, Card, Chip, RadioGroup } from '@heroui/react'
+import { ArrowRight, ShieldAlert } from 'lucide-react'
 import { useState } from 'react'
 import { submitPemahamanAttempt } from '../services/api'
-import OptionCard from './OptionCard'
+import { RadioOption } from './OptionCard'
 
 const SOAL_CHECK = [
   {
@@ -62,59 +63,62 @@ function KnowledgeCheck({ phase = 'awal', onComplete }) {
 
   if (isFinished) {
     return (
-      <div className="callout-slot flex flex-col gap-2 border border-[var(--color-rust)]/30 bg-black p-5">
-        <div className="flex items-center gap-2">
-          <CheckCircle size={18} className="text-[var(--color-sage)]" aria-hidden="true" />
-          <p className="text-sm font-bold text-white">
+      <Alert status="success" className="items-start">
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Title className="font-bold">
             Pencek Pemahaman ({phase === 'awal' ? 'Sebelum Materi' : 'Setelah Materi'}): {correctCount} dari {SOAL_CHECK.length} poin
-          </p>
-        </div>
-        <p className="text-xs text-[var(--color-ink-on-bg-muted)]">
-          {phase === 'awal'
-            ? 'Bagus! Sekarang selesaikan 3 skenario interaktif di bawah untuk memperdalam pemahamanmu.'
-            : 'Terima kasih telah menguji pemahaman akhirmu. Nilai pemahamanmu dicatat anonim untuk mengukur efektivitas edukasi.'}
-        </p>
-      </div>
+          </Alert.Title>
+          <Alert.Description className="text-sm leading-relaxed text-slate-600">
+            {phase === 'awal'
+              ? 'Bagus! Sekarang selesaikan 3 skenario interaktif di bawah untuk memperdalam pemahamanmu.'
+              : 'Terima kasih telah menguji pemahaman akhirmu. Nilai pemahamanmu dicatat anonim untuk mengukur efektivitas edukasi.'}
+          </Alert.Description>
+        </Alert.Content>
+      </Alert>
     )
   }
 
   return (
-    <div className="panel-glow panel-glow-neutral flex flex-col gap-4 p-5 sm:p-6" data-testid={`knowledge-check-${phase}`}>
-      <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+    <Card className="flex flex-col gap-4 rounded-[24px] border border-slate-200 p-5 sm:p-6" data-testid={`knowledge-check-${phase}`}>
+      <Card.Header className="flex flex-row flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <ShieldAlert size={18} className="text-[var(--color-rust)]" aria-hidden="true" />
-          <h3 className="text-sm font-bold text-white">
-            Uji Pemahaman Singkat ({phase === 'awal' ? 'Pre-Test' : 'Post-Test'}) · {index + 1}/{SOAL_CHECK.length}
-          </h3>
+          <ShieldAlert size={18} className="text-[var(--accent)]" aria-hidden="true" />
+          <Card.Title className="text-base font-bold text-slate-900">
+            Uji Pemahaman Singkat ({phase === 'awal' ? 'Pre-Test' : 'Post-Test'})
+          </Card.Title>
         </div>
-      </div>
+        <Chip color="accent" variant="soft" size="sm" className="font-bold">
+          {index + 1}/{SOAL_CHECK.length}
+        </Chip>
+      </Card.Header>
 
-      <p className="text-xs font-medium text-[var(--color-ink-on-bg-muted)]">{current.tanya}</p>
-
-      <div className="flex flex-col gap-2">
+      <RadioGroup
+        key={current.id}
+        aria-label={current.tanya}
+        name={`check-${phase}-${index}`}
+        value={selected === null ? null : String(selected)}
+        onChange={(value) => setSelected(Number(value))}
+        className="flex flex-col gap-2.5"
+      >
+        <p className="text-[15px] font-semibold text-slate-800">{current.tanya}</p>
         {current.opsi.map((item, optIdx) => (
-          <OptionCard
-            key={item.label}
-            name={`check-${phase}-${index}`}
-            value={optIdx}
-            checked={selected === optIdx}
-            onChange={() => setSelected(optIdx)}
-          >
-            <span className="text-xs">{item.label}</span>
-          </OptionCard>
+          <RadioOption key={item.label} value={String(optIdx)}>
+            {item.label}
+          </RadioOption>
         ))}
-      </div>
+      </RadioGroup>
 
-      <button
-        type="button"
-        className="btn-primary-rust w-fit self-end !px-4 !py-2 !text-xs"
-        disabled={selected === null}
-        onClick={handleNext}
+      <Button
+        variant="primary"
+        className="btn-cta w-full sm:w-fit sm:self-end"
+        isDisabled={selected === null}
+        onPress={handleNext}
       >
         {isLast ? 'Lihat ringkasan' : 'Lanjut'}
         <ArrowRight size={14} aria-hidden="true" />
-      </button>
-    </div>
+      </Button>
+    </Card>
   )
 }
 

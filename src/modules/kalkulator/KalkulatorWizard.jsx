@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Clock3, History, Landmark, Store, Volume2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import OptionCard from '../../components/OptionCard'
+import { Button, CheckboxGroup, Chip, RadioGroup } from '@heroui/react'
+import { CheckboxOption, RadioOption } from '../../components/OptionCard'
 import ProgressDots from '../../components/ProgressDots'
 import { speakScenario, stopNarration } from '../../utils/narration'
 import {
@@ -86,7 +87,7 @@ function KalkulatorWizard({ onComplete, soundOn = true }) {
 
   return (
     <div
-      className="relative mx-auto flex w-full max-w-[1100px] flex-col gap-9 rounded-[28px] border border-orange-100 bg-white/95 p-6 shadow-xl shadow-orange-200/50 backdrop-blur-sm sm:p-12"
+      className="relative mx-auto flex w-full max-w-[1100px] flex-col gap-6 rounded-[24px] border border-orange-100 bg-white/95 p-5 shadow-xl shadow-orange-200/50 backdrop-blur-sm sm:gap-9 sm:rounded-[28px] sm:p-8 lg:p-12"
       data-testid="kalkulator-wizard"
       data-tour="kalkulator-panel"
     >
@@ -97,113 +98,132 @@ function KalkulatorWizard({ onComplete, soundOn = true }) {
           event.preventDefault()
           handleNext()
         }}
-        className="flex flex-col items-center gap-8"
+        className="flex flex-col items-center gap-6 sm:gap-8"
       >
         <div className="flex flex-col items-center gap-2 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8590C] text-white shadow-lg shadow-orange-500/30">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)] text-white shadow-lg shadow-orange-500/30">
             <Icon size={24} aria-hidden="true" />
           </span>
-          <p className="text-[11px] font-black tracking-widest text-[#E8590C] uppercase">{label}</p>
-          <button
-            type="button"
-            onClick={() => speakScenario(question)}
-            className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-bold text-orange-800 transition hover:bg-orange-200"
+          <Chip variant="soft" color="accent" size="sm" className="font-black tracking-widest uppercase">
+            {label}
+          </Chip>
+          <Button
+            variant="secondary"
+            size="sm"
+            onPress={() => speakScenario(question)}
+            className="h-11 bg-[var(--accent-soft)] px-4 font-bold text-[var(--accent-soft-foreground)] hover:bg-[var(--accent-soft-hover)]"
             aria-label="Dengarkan lagi pertanyaan ini"
           >
-            <Volume2 size={12} aria-hidden="true" />
+            <Volume2 size={14} aria-hidden="true" />
             Dengarkan
-          </button>
+          </Button>
         </div>
-        <fieldset key={step} className="fade-scale-in flex w-full max-w-[640px] flex-col items-center gap-6">
-          <legend className="mb-1 text-center text-2xl font-extrabold text-slate-900">
-            {step === 'omzet' && QUESTIONS.omzet}
-            {step === 'pengalaman' && QUESTIONS.pengalaman}
-            {step === 'waktu' && QUESTIONS.waktu}
-            {step === 'rekening' && QUESTIONS.rekening}
+        <fieldset key={step} className="fade-scale-in flex w-full max-w-[640px] flex-col items-center gap-4 sm:gap-6">
+          <legend className="mb-1 text-center text-xl leading-snug font-extrabold text-balance text-slate-900 sm:text-2xl">
+            {question}
           </legend>
-          <div className="flex w-full flex-col gap-3">
-            {step === 'omzet' &&
-              OMZET_OPTIONS.map((option) => (
-                <OptionCard
-                  key={option.value}
-                  tone="light"
-                  name="omzet"
-                  value={option.value}
-                  checked={answers.omzetHarian === option.value}
-                  onChange={() => answerAndStop((prev) => ({ ...prev, omzetHarian: option.value }))}
-                >
-                  {option.label}
-                </OptionCard>
-              ))}
 
-            {step === 'pengalaman' &&
-              PENGALAMAN_OPTIONS.map((option) => (
-                <OptionCard
-                  key={option.value}
-                  tone="light"
-                  type="checkbox"
-                  name="pengalaman"
-                  value={option.value}
-                  checked={answers.pengalaman.includes(option.value)}
-                  onChange={() =>
-                    answerAndStop((prev) => ({
-                      ...prev,
-                      pengalaman: togglePengalaman(prev.pengalaman, option.value, TIDAK_PERNAH_VALUE),
-                    }))
+          {step === 'omzet' && (
+            <RadioGroup
+              aria-label={question}
+              name="omzet"
+              value={answers.omzetHarian === null ? null : String(answers.omzetHarian)}
+              onChange={(value) => answerAndStop((prev) => ({ ...prev, omzetHarian: Number(value) }))}
+              className="flex w-full flex-col gap-3"
+            >
+              {OMZET_OPTIONS.map((option) => (
+                <RadioOption key={option.value} value={String(option.value)}>
+                  {option.label}
+                </RadioOption>
+              ))}
+            </RadioGroup>
+          )}
+
+          {step === 'pengalaman' && (
+            <CheckboxGroup
+              aria-label={question}
+              name="pengalaman"
+              value={answers.pengalaman}
+              onChange={(next) =>
+                answerAndStop((prev) => {
+                  // Bandingkan dengan pilihan sebelumnya untuk tahu opsi mana yang
+                  // baru di-toggle, lalu pakai aturan eksklusif yang sama.
+                  const toggled =
+                    next.find((value) => !prev.pengalaman.includes(value)) ??
+                    prev.pengalaman.find((value) => !next.includes(value))
+                  if (!toggled) return prev
+                  return {
+                    ...prev,
+                    pengalaman: togglePengalaman(prev.pengalaman, toggled, TIDAK_PERNAH_VALUE),
                   }
-                >
+                })
+              }
+              className="flex w-full flex-col gap-3"
+            >
+              {PENGALAMAN_OPTIONS.map((option) => (
+                <CheckboxOption key={option.value} value={option.value}>
                   {option.label}
-                </OptionCard>
+                </CheckboxOption>
               ))}
+            </CheckboxGroup>
+          )}
 
-            {step === 'waktu' &&
-              WAKTU_OPTIONS.map((option) => (
-                <OptionCard
-                  key={option.value}
-                  tone="light"
-                  name="waktu"
-                  value={option.value}
-                  checked={answers.waktuMenit === option.value}
-                  onChange={() => answerAndStop((prev) => ({ ...prev, waktuMenit: option.value }))}
-                >
+          {step === 'waktu' && (
+            <RadioGroup
+              aria-label={question}
+              name="waktu"
+              value={answers.waktuMenit === null ? null : String(answers.waktuMenit)}
+              onChange={(value) => answerAndStop((prev) => ({ ...prev, waktuMenit: Number(value) }))}
+              className="flex w-full flex-col gap-3"
+            >
+              {WAKTU_OPTIONS.map((option) => (
+                <RadioOption key={option.value} value={String(option.value)}>
                   {option.label}
-                </OptionCard>
+                </RadioOption>
               ))}
+            </RadioGroup>
+          )}
 
-            {step === 'rekening' &&
-              REKENING_OPTIONS.map((option) => (
-                <OptionCard
-                  key={option.value}
-                  tone="light"
-                  name="rekening"
-                  value={option.value}
-                  checked={answers.punyaRekening === option.value}
-                  onChange={() => answerAndStop((prev) => ({ ...prev, punyaRekening: option.value }))}
-                >
+          {step === 'rekening' && (
+            <RadioGroup
+              aria-label={question}
+              name="rekening"
+              value={answers.punyaRekening}
+              onChange={(value) => answerAndStop((prev) => ({ ...prev, punyaRekening: value }))}
+              className="flex w-full flex-col gap-3"
+            >
+              {REKENING_OPTIONS.map((option) => (
+                <RadioOption key={option.value} value={option.value}>
                   {option.label}
-                </OptionCard>
+                </RadioOption>
               ))}
-          </div>
+            </RadioGroup>
+          )}
         </fieldset>
 
-        <div className="flex w-full max-w-[640px] items-center justify-between gap-3">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-orange-200 bg-white px-6 py-3 text-sm font-bold text-orange-800 shadow-sm transition hover:border-orange-300 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40"
-            onClick={handlePrev}
-            disabled={stepIndex === 0}
+        <div className="flex w-full max-w-[640px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Button
+            variant="outline"
+            size="lg"
+            className="btn-cta btn-accent-outline order-2 sm:order-1 sm:w-auto"
+            fullWidth
+            onPress={handlePrev}
+            isDisabled={stepIndex === 0}
           >
             <ArrowLeft size={16} aria-hidden="true" />
             Sebelumnya
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8590C] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/30 transition hover:bg-[#C94F08] disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={!canProceed}
+            variant="primary"
+            size="lg"
+            fullWidth
+            className="btn-cta order-1 shadow-lg shadow-orange-500/30 sm:order-2 sm:w-auto sm:min-w-[160px]"
+            isDisabled={!canProceed}
           >
             {isLastStep ? 'Lihat hasil' : 'Lanjut'}
             <ArrowRight size={16} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -1,12 +1,20 @@
+import { Button, Kbd } from '@heroui/react'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 const SPOTLIGHT_PADDING = 8
 const TOOLTIP_WIDTH = 320
 
-function getTargetRect(target) {
+// Satu target bisa punya versi mobile & desktop (mis. CTA topbar); pilih
+// elemen yang sedang terlihat (ukuran > 0), jatuh ke yang pertama bila tak ada.
+function findTarget(target) {
   if (!target) return null
-  const el = document.querySelector(`[data-tour="${target}"]`)
+  const all = [...document.querySelectorAll(`[data-tour="${target}"]`)]
+  return all.find((el) => el.getClientRects().length > 0) ?? all[0] ?? null
+}
+
+function getTargetRect(target) {
+  const el = findTarget(target)
   return el ? el.getBoundingClientRect() : null
 }
 
@@ -17,7 +25,7 @@ function ProductTour({ steps, stepIndex, isActive, onNext, onPrev, onSkip }) {
   useEffect(() => {
     if (!step) return undefined
 
-    const el = step.target ? document.querySelector(`[data-tour="${step.target}"]`) : null
+    const el = findTarget(step.target)
     if (typeof el?.scrollIntoView === 'function') {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
@@ -78,31 +86,34 @@ function ProductTour({ steps, stepIndex, isActive, onNext, onPrev, onSkip }) {
       <div className="tour-spotlight" style={spotlightStyle} aria-hidden="true" />
 
       <div className="fade-scale-in tour-tooltip" style={tooltipStyle}>
-        <p className="text-[11px] font-semibold tracking-wide text-[var(--color-ochre)] uppercase">
+        <p className="text-[11px] font-black tracking-widest text-[#E8590C] uppercase">
           Langkah {stepIndex + 1} dari {steps.length}
         </p>
-        <h4 className="mt-1 text-base font-bold text-white">{step.title}</h4>
-        <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-ink-on-bg-muted)]">{step.desc}</p>
+        <h4 className="mt-1 text-base font-bold text-slate-900">{step.title}</h4>
+        <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{step.desc}</p>
 
         <div className="mt-4 flex items-center justify-between gap-2">
-          <button
-            type="button"
-            className="text-xs font-medium text-[var(--color-ink-on-bg-muted)] hover:text-white"
-            onClick={onSkip}
-          >
+          <Button variant="ghost" size="sm" className="h-11 px-3 text-xs font-semibold text-slate-500" onPress={onSkip}>
             Lewati
-          </button>
+          </Button>
           <div className="flex items-center gap-2">
             {!isFirst && (
-              <button type="button" className="btn-ghost !px-3 !py-1.5 !text-xs" onClick={onPrev}>
+              <Button variant="outline" size="sm" className="h-11 rounded-full border-2 px-4 text-xs font-bold" onPress={onPrev}>
                 Sebelumnya
-              </button>
+              </Button>
             )}
-            <button type="button" className="btn-primary !px-3 !py-1.5 !text-xs" onClick={onNext}>
+            <Button variant="primary" size="sm" className="h-11 rounded-full px-5 text-xs font-bold shadow-md" onPress={onNext}>
               {isLast ? 'Selesai' : 'Lanjut'}
-            </button>
+            </Button>
           </div>
         </div>
+        <p className="mt-3 hidden items-center gap-1.5 text-[11px] text-slate-400 sm:flex">
+          Tekan
+          <Kbd>
+            <Kbd.Abbr keyValue="escape" />
+          </Kbd>
+          untuk menutup panduan
+        </p>
       </div>
     </div>,
     document.body,

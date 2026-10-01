@@ -1,4 +1,5 @@
-import { ArrowRight, Check, ChevronDown, Lightbulb, Receipt, TrendingDown, TrendingUp, X } from 'lucide-react'
+import { Accordion, Button, ToggleButton, buttonVariants } from '@heroui/react'
+import { ArrowRight, Check, Lightbulb, Receipt, TrendingDown, TrendingUp, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import KoraNote from '../../components/KoraNote'
 import { formatJam, formatRupiah } from '../../utils/format'
@@ -56,7 +57,7 @@ function KalkulatorResult({ answers, result, onReset }) {
 
   return (
     <div
-      className="relative mx-auto flex w-full max-w-[1100px] flex-col items-center gap-8 overflow-hidden rounded-[28px] border border-orange-100 bg-white/95 p-6 shadow-xl shadow-orange-200/50 backdrop-blur-sm sm:p-14"
+      className="relative mx-auto flex w-full max-w-[1100px] flex-col items-center gap-6 overflow-hidden rounded-[24px] border border-orange-100 bg-white/95 p-5 shadow-xl shadow-orange-200/50 backdrop-blur-sm sm:gap-8 sm:rounded-[28px] sm:p-8 lg:p-14"
       data-testid="kalkulator-result"
     >
       {/* Hujan koin */}
@@ -80,25 +81,23 @@ function KalkulatorResult({ answers, result, onReset }) {
 
       {/* Hero angka + tab periode */}
       <div className="relative flex w-full flex-col items-center gap-4 text-center">
+        {/* ToggleButton HeroUI mandiri (bukan ToggleButtonGroup) supaya tetap
+            tombol ber-aria-pressed seperti sebelumnya, bukan radio. */}
         <div
           role="group"
           aria-label="Pilih periode tampilan"
-          className="inline-flex rounded-full border border-orange-200 bg-orange-50 p-1"
+          className="inline-flex rounded-full border border-[color-mix(in_oklab,var(--accent)_25%,white)] bg-[var(--accent-soft)] p-1"
         >
           {MODES.map((item) => (
-            <button
+            <ToggleButton
               key={item.id}
-              type="button"
-              aria-pressed={modeId === item.id}
-              onClick={() => setModeId(item.id)}
-              className={`rounded-full px-4 py-1.5 text-[13px] font-bold transition ${
-                modeId === item.id
-                  ? 'bg-[#E8590C] text-white shadow'
-                  : 'text-orange-800 hover:bg-orange-100'
-              }`}
+              isSelected={modeId === item.id}
+              onChange={() => setModeId(item.id)}
+              variant="ghost"
+              className="h-11 min-w-[88px] rounded-full px-4 text-[13px] font-bold text-[var(--accent-soft-foreground)] data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-white data-[selected=true]:shadow"
             >
               {item.label}
-            </button>
+            </ToggleButton>
           ))}
         </div>
 
@@ -106,10 +105,10 @@ function KalkulatorResult({ answers, result, onReset }) {
           <p className="text-xs font-black tracking-widest text-[#E8590C] uppercase">
             Waktu yang selama ini terbuang menghitung uang tunai
           </p>
-          <p className="text-6xl font-black tracking-tight text-slate-900 sm:text-7xl">
+          <p className="text-5xl font-black tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             {formatJam(jamTampil)}
           </p>
-          <p className="max-w-md text-sm text-slate-600">
+          <p className="max-w-md text-[15px] leading-relaxed text-slate-600">
             per {mode.kata} menghitung &amp; menyetor uang tunai — setara{' '}
             <strong className="text-slate-900">
               {formatRupiah(nilaiTampil)}
@@ -120,81 +119,84 @@ function KalkulatorResult({ answers, result, onReset }) {
         </div>
       </div>
 
-      <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-[13px] font-medium text-slate-700">
+      <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-2xl border border-orange-200 bg-orange-50 px-4 py-2 text-center text-sm font-medium text-slate-700 sm:rounded-full">
         <Receipt size={16} className="text-[#E8590C]" aria-hidden="true" />
         {formatRupiah(omzetHarian)}/hari × 30 hari = <strong>{formatRupiah(uangTunaiPerBulan)}</strong>
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
-        <details
-          open
-          className="group flex flex-col gap-4 rounded-[20px] border border-red-200 bg-red-50/70 p-7"
-        >
-          <summary className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100">
-              <TrendingDown size={18} className="text-red-600" aria-hidden="true" />
-            </span>
-            <h3 className="flex-1 text-left text-[17px] font-bold text-slate-900">
-              Sisi tunai yang kamu alami
-            </h3>
-            <ChevronDown
-              size={18}
-              className="shrink-0 text-slate-400 transition group-open:rotate-180"
-              aria-hidden="true"
-            />
-          </summary>
-
-          {tidakAdaPengalaman ? (
-            <p className="text-sm leading-relaxed text-slate-600">{PENGALAMAN_KOSONG_MESSAGE}</p>
-          ) : (
-            pengalamanDipilih.map((item) => {
-              const info = PENGALAMAN_INFO[item]
-              return (
-                <div key={item} className="flex flex-col gap-2">
-                  <div className="flex items-start gap-2.5">
-                    <X size={14} className="mt-1 shrink-0 text-red-500" aria-hidden="true" />
-                    <p className="text-sm leading-relaxed text-slate-600">
-                      <span className="font-semibold text-slate-900">{info.label}. </span>
-                      {info.kerugian}
-                    </p>
-                  </div>
-                  {info.tips && (
-                    <div className="ml-6 flex items-start gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-red-100">
-                      <Lightbulb size={14} className="mt-0.5 shrink-0 text-[#E8590C]" aria-hidden="true" />
-                      <p className="text-xs leading-relaxed text-slate-600">{info.tips}</p>
+      <Accordion
+        allowsMultipleExpanded
+        defaultExpandedKeys={['tunai', 'manfaat']}
+        className="grid w-full grid-cols-1 items-start gap-4 md:grid-cols-2 md:gap-6"
+      >
+        <Accordion.Item id="tunai" className="rounded-[20px] border border-red-200 bg-red-50/70">
+          <Accordion.Heading>
+            <Accordion.Trigger className="min-h-[56px] gap-2.5 px-5 py-4 sm:px-7 sm:pt-6">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100">
+                <TrendingDown size={18} className="text-red-600" aria-hidden="true" />
+              </span>
+              <span className="flex-1 text-left font-display text-[17px] font-bold text-slate-900">
+                Sisi tunai yang kamu alami
+              </span>
+              <Accordion.Indicator className="text-slate-400" />
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body className="flex flex-col gap-4 px-5 pb-5 sm:px-7 sm:pb-7">
+              {tidakAdaPengalaman ? (
+                <p className="text-sm leading-relaxed text-slate-600">{PENGALAMAN_KOSONG_MESSAGE}</p>
+              ) : (
+                pengalamanDipilih.map((item) => {
+                  const info = PENGALAMAN_INFO[item]
+                  return (
+                    <div key={item} className="flex flex-col gap-2">
+                      <div className="flex items-start gap-2.5">
+                        <X size={14} className="mt-1 shrink-0 text-red-500" aria-hidden="true" />
+                        <p className="text-sm leading-relaxed text-slate-600">
+                          <span className="font-semibold text-slate-900">{info.label}. </span>
+                          {info.kerugian}
+                        </p>
+                      </div>
+                      {info.tips && (
+                        <div className="ml-6 flex items-start gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-red-100">
+                          <Lightbulb size={14} className="mt-0.5 shrink-0 text-[#E8590C]" aria-hidden="true" />
+                          <p className="text-sm leading-relaxed text-slate-600">{info.tips}</p>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  )
+                })
+              )}
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
+
+        <Accordion.Item id="manfaat" className="rounded-[20px] border border-emerald-200 bg-emerald-50/70">
+          <Accordion.Heading>
+            <Accordion.Trigger className="min-h-[56px] gap-2.5 px-5 py-4 sm:px-7 sm:pt-6">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+                <TrendingUp size={18} className="text-emerald-600" aria-hidden="true" />
+              </span>
+              <span className="flex-1 text-left font-display text-[17px] font-bold text-slate-900">
+                Manfaat QRIS untukmu
+              </span>
+              <Accordion.Indicator className="text-slate-400" />
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body className="flex flex-col gap-4 px-5 pb-5 sm:px-7 sm:pb-7">
+              {manfaatList.map((manfaat, index) => (
+                <div key={index} className="flex items-start gap-2.5">
+                  <Check size={14} className="mt-1 shrink-0 text-emerald-600" aria-hidden="true" />
+                  <p className="text-sm leading-relaxed text-slate-600">{manfaat}</p>
                 </div>
-              )
-            })
-          )}
-        </details>
+              ))}
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
 
-        <details
-          open
-          className="group flex flex-col gap-4 rounded-[20px] border border-emerald-200 bg-emerald-50/70 p-7"
-        >
-          <summary className="flex cursor-pointer list-none items-center gap-2.5 [&::-webkit-details-marker]:hidden">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100">
-              <TrendingUp size={18} className="text-emerald-600" aria-hidden="true" />
-            </span>
-            <h3 className="flex-1 text-left text-[17px] font-bold text-slate-900">Manfaat QRIS untukmu</h3>
-            <ChevronDown
-              size={18}
-              className="shrink-0 text-slate-400 transition group-open:rotate-180"
-              aria-hidden="true"
-            />
-          </summary>
-          {manfaatList.map((manfaat, index) => (
-            <div key={index} className="flex items-start gap-2.5">
-              <Check size={14} className="mt-1 shrink-0 text-emerald-600" aria-hidden="true" />
-              <p className="text-sm leading-relaxed text-slate-600">{manfaat}</p>
-            </div>
-          ))}
-        </details>
-      </div>
-
-      <div className="flex w-full items-center gap-4 rounded-2xl bg-slate-900 px-6 py-5" data-testid="kalk-message">
+      <div className="flex w-full items-center gap-4 rounded-2xl bg-slate-900 px-5 py-4 sm:px-6 sm:py-5" data-testid="kalk-message">
         <p className="text-sm leading-relaxed font-medium text-white">{REKOMENDASI[punyaRekening]}</p>
       </div>
 
@@ -204,23 +206,23 @@ function KalkulatorResult({ answers, result, onReset }) {
 
       <p className="text-center text-xs text-slate-500 italic">{DISCLAIMER}</p>
 
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:justify-center">
         <a
           href={BI_QRIS_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8590C] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/30 transition hover:bg-[#C94F08]"
+          className={buttonVariants({ variant: 'primary', className: 'btn-cta w-full shadow-lg shadow-orange-500/30 sm:w-auto' })}
         >
           Yuk Daftar QRIS Sekarang
           <ArrowRight size={16} aria-hidden="true" />
         </a>
-        <button
-          type="button"
-          className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-orange-200 bg-white px-6 py-3 text-sm font-bold text-orange-800 transition hover:border-orange-300 hover:bg-orange-50"
-          onClick={onReset}
+        <Button
+          variant="outline"
+          className="btn-cta btn-accent-outline w-full sm:w-auto"
+          onPress={onReset}
         >
           ↻ Hitung ulang
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -9,5 +9,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.js',
+    // Alur interaksi panjang (10 soal kuis, 4 langkah wizard) dengan komponen
+    // React Aria/HeroUI bisa melewati 5 dtk saat semua file jalan paralel.
+    testTimeout: 20000,
   },
 })

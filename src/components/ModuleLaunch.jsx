@@ -1,3 +1,4 @@
+import { Button, Chip, CloseButton, Spinner } from '@heroui/react'
 import { Play, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import maskotKora from '../assets/img/BonekaKoRa-removebg.png'
@@ -51,7 +52,7 @@ function ModuleLaunch({ module, onPlay, onClose }) {
       role="dialog"
       aria-modal="true"
       aria-label={`Siap main ${module.title}`}
-      className="fixed inset-0 z-[9990] flex items-center justify-center overflow-hidden bg-[#0b1e3a]/92 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9990] flex items-center justify-center overflow-y-auto overscroll-contain bg-[#0b1e3a]/92 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-sm"
       onClick={onClose}
     >
       {/* Kabut latar */}
@@ -62,33 +63,32 @@ function ModuleLaunch({ module, onPlay, onClose }) {
       </div>
 
       <div
-        className="launch-card relative w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 shadow-2xl"
+        className="launch-card relative my-auto w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 shadow-2xl"
         style={{ background: module.bg }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          onClick={onClose}
+        <CloseButton
+          onPress={onClose}
           aria-label="Batalkan dan kembali"
-          className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white transition hover:bg-black/50"
+          className="absolute top-3 right-3 z-20 flex size-11 items-center justify-center rounded-full bg-black/30 text-white transition hover:bg-black/50 active:bg-black/60"
         >
-          <X size={17} aria-hidden="true" />
-        </button>
+          <X size={20} aria-hidden="true" />
+        </CloseButton>
 
         {/* Zona terbang KoRa */}
-        <div className="relative flex h-[210px] items-center justify-center overflow-hidden">
+        <div className="relative flex h-[180px] items-center justify-center overflow-hidden sm:h-[210px]">
           <span className="launch-runway" aria-hidden="true" />
           {stage === 'fly' ? (
             <img
               src={maskotKora}
               alt="KoRa terbang menuju permainan"
-              className="kora-fly relative z-10 h-[150px] w-auto object-contain drop-shadow-2xl"
+              className="kora-fly relative z-10 h-[130px] w-auto object-contain drop-shadow-2xl sm:h-[150px]"
             />
           ) : (
             <img
               src={maskotKora}
               alt="KoRa siap bermain"
-              className="mascot-float relative z-10 h-[150px] w-auto object-contain drop-shadow-2xl"
+              className="mascot-float relative z-10 h-[130px] w-auto object-contain drop-shadow-2xl sm:h-[150px]"
             />
           )}
           {stage !== 'blast' && (
@@ -102,29 +102,31 @@ function ModuleLaunch({ module, onPlay, onClose }) {
 
         {/* Konten */}
         <div className="relative bg-white px-6 pt-5 pb-6 text-center sm:px-8">
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-black tracking-wide text-[#15335F] uppercase">
+          <Chip variant="secondary" size="sm" className="gap-1.5 bg-slate-100 font-black tracking-wide text-[#15335F] uppercase">
             {Icon && <Icon size={13} aria-hidden="true" />}
             {module.badge}
-          </p>
-          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900">{module.title}</h3>
-          <p className="mx-auto mt-1 max-w-[380px] text-[13.5px] leading-relaxed text-slate-500">{module.desc}</p>
+          </Chip>
+          <h3 className="mt-2 text-[22px] leading-tight font-black tracking-tight text-slate-900 sm:text-2xl">{module.title}</h3>
+          <p className="mx-auto mt-1 max-w-[380px] text-[15px] leading-relaxed text-slate-600">{module.desc}</p>
 
           {stage === 'fly' ? (
-            <p className="mt-5 text-[13px] font-bold text-slate-400" role="status">
+            <p className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500" role="status">
+              <Spinner size="sm" color="current" />
               KoRa sedang menyiapkan permainan…
             </p>
           ) : (
             <div className="fade-scale-in mt-5 flex flex-col items-center gap-2.5">
-              <button
+              <Button
                 ref={playRef}
-                type="button"
-                onClick={handlePlay}
+                variant="primary"
+                isIconOnly
+                onPress={handlePlay}
                 aria-label={`Mulai main ${module.title}`}
-                className="play-btn group relative flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[#15335F] text-white shadow-xl shadow-[#15335F]/30 transition hover:scale-105 active:scale-95"
+                className="play-btn group relative size-[100px] rounded-full bg-[#15335F] text-white shadow-xl shadow-[#15335F]/30 hover:scale-105 hover:bg-[#0e2547] [&_svg.lucide-play]:size-[42px]"
               >
                 <span className="play-ping" aria-hidden="true" />
-                <Play size={38} fill="currentColor" aria-hidden="true" className="ml-1" />
-              </button>
+                <Play size={42} fill="currentColor" aria-hidden="true" className="ml-1" />
+              </Button>
               <p className="text-[15px] font-black tracking-wide text-[#15335F] uppercase">
                 Tekan Play untuk mulai!
               </p>

@@ -1,3 +1,4 @@
+import { Button } from '@heroui/react'
 import { CircleCheck, CircleX } from 'lucide-react'
 
 function AnswerCard({ label, isAnswered, isSelected, isCorrect, onClick, tone = 'dark' }) {
@@ -35,21 +36,23 @@ function AnswerCard({ label, isAnswered, isSelected, isCorrect, onClick, tone = 
         />
       )
     } else {
-      state['data-disabled'] = 'true'
+      // data-dimmed (bukan data-disabled) karena React Aria sudah memakai
+      // data-disabled untuk semua tombol yang dinonaktifkan setelah menjawab.
+      state['data-dimmed'] = 'true'
     }
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
       className={idleCard}
-      onClick={onClick}
-      disabled={isAnswered}
+      onPress={onClick}
+      isDisabled={isAnswered}
       {...state}
     >
       {icon}
-      <span>{label}</span>
-    </button>
+      <span className="min-w-0 flex-1">{label}</span>
+    </Button>
   )
 }
 

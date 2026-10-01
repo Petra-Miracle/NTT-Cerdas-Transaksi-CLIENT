@@ -1,3 +1,16 @@
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Description,
+  Form,
+  Label,
+  Radio,
+  RadioGroup,
+  TextArea,
+  TextField,
+} from '@heroui/react'
 import { MessageSquarePlus, Send } from 'lucide-react'
 import { useState } from 'react'
 import { submitFeedback } from '../services/api'
@@ -32,117 +45,104 @@ function FeedbackForm({ modul }) {
 
   if (submitted) {
     return (
-      <div className="callout-slot text-center" role="status">
-        <p className="font-bold text-[var(--color-sage)]">Terima kasih atas masukanmu.</p>
-        <p className="mt-1 text-sm text-[var(--color-ink-on-bg-muted)]">
-          Jawaban anonim ini membantu kami menyempurnakan edukasi QRIS dan Rupiah untuk UMKM NTT.
-        </p>
-      </div>
+      <Alert status="success" role="status" className="items-start">
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Title className="font-bold">Terima kasih atas masukanmu.</Alert.Title>
+          <Alert.Description className="text-sm text-slate-600">
+            Jawaban anonim ini membantu kami menyempurnakan edukasi QRIS dan Rupiah untuk UMKM NTT.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert>
     )
   }
 
   return (
-    <section className="panel-glow panel-glow-neutral flex w-full flex-col gap-5 p-6 sm:p-8" aria-labelledby={`feedback-${modul}`}>
-      <div className="flex items-start gap-3">
-        <span className="icon-chip h-10 w-10 border-none bg-white/10">
-          <MessageSquarePlus size={19} className="text-[var(--color-ochre)]" aria-hidden="true" />
+    <Card
+      render={(props) => <section {...props} />}
+      className="flex w-full flex-col gap-5 rounded-[24px] border border-slate-200 p-5 sm:p-8"
+      aria-labelledby={`feedback-${modul}`}
+    >
+      <Card.Header className="flex flex-row items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-soft)]">
+          <MessageSquarePlus size={19} className="text-[var(--accent)]" aria-hidden="true" />
         </span>
         <div>
-          <h3 id={`feedback-${modul}`} className="text-lg font-bold text-white">
+          <Card.Title id={`feedback-${modul}`} className="text-lg font-bold text-slate-900">
             Bantu Perbaiki Materi Ini
-          </h3>
-          <p className="text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">
+          </Card.Title>
+          <Card.Description className="text-sm leading-relaxed text-slate-600">
             Tidak meminta nama atau nomor telepon. Jawab singkat agar materi makin berguna.
-          </p>
+          </Card.Description>
         </div>
-      </div>
+      </Card.Header>
 
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-semibold text-white">1. Seberapa paham kamu setelah menyelesaikan modul ini?</legend>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Tingkat pemahaman">
+      <Form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        <RadioGroup
+          name={`pemahaman-${modul}`}
+          orientation="horizontal"
+          value={pemahaman === null ? null : String(pemahaman)}
+          onChange={(value) => setPemahaman(Number(value))}
+          className="flex flex-col gap-2"
+        >
+          <Label className="text-sm font-semibold text-slate-900">
+            1. Seberapa paham kamu setelah menyelesaikan modul ini?
+          </Label>
+          <div className="flex flex-wrap gap-2">
             {[1, 2, 3, 4, 5].map((nilai) => (
-              <label
-                key={nilai}
-                className={`flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border text-sm font-bold transition ${
-                  pemahaman === nilai
-                    ? 'border-[var(--color-ochre)] bg-[var(--color-ochre)] text-[var(--color-ochre-text)]'
-                    : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`pemahaman-${modul}`}
-                  value={nilai}
-                  checked={pemahaman === nilai}
-                  onChange={() => setPemahaman(nilai)}
-                  className="sr-only"
-                  aria-label={String(nilai)}
-                />
-                {nilai}
-              </label>
+              <Radio key={nilai} value={String(nilai)}>
+                <Radio.Content className="flex size-11 items-center justify-center rounded-xl border-2 border-slate-200 bg-white text-sm font-bold text-slate-700 transition data-[hovered=true]:border-[var(--accent)] data-[selected=true]:border-[var(--accent)] data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-white data-[focus-visible=true]:outline-3 data-[focus-visible=true]:outline-offset-2 data-[focus-visible=true]:outline-[var(--focus)]">
+                  {nilai}
+                </Radio.Content>
+              </Radio>
             ))}
           </div>
-          <p className="text-xs text-[var(--color-ink-on-bg-muted)]">1 = belum paham, 5 = sangat paham</p>
-        </fieldset>
+          <Description className="text-xs text-slate-500">1 = belum paham, 5 = sangat paham</Description>
+        </RadioGroup>
 
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-sm font-semibold text-white">2. Apakah materi ini relevan dengan kegiatanmu?</legend>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Relevansi materi">
+        <RadioGroup
+          name={`relevansi-${modul}`}
+          orientation="horizontal"
+          value={relevansi}
+          onChange={setRelevansi}
+          className="flex flex-col gap-2"
+        >
+          <Label className="text-sm font-semibold text-slate-900">2. Apakah materi ini relevan dengan kegiatanmu?</Label>
+          <div className="flex flex-wrap gap-2">
             {RELEVANSI.map((option) => (
-              <label
-                key={option.value}
-                className={`cursor-pointer rounded-full border px-4 py-2 text-xs font-medium transition ${
-                  relevansi === option.value
-                    ? 'border-[var(--color-indigo)] bg-[var(--color-indigo)] text-white'
-                    : 'border-white/20 bg-white/5 text-[var(--color-ink-on-bg-muted)] hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`relevansi-${modul}`}
-                  value={option.value}
-                  checked={relevansi === option.value}
-                  onChange={() => setRelevansi(option.value)}
-                  className="sr-only"
-                  aria-label={option.label}
-                />
-                {option.label}
-              </label>
+              <Radio key={option.value} value={option.value}>
+                <Radio.Content className="inline-flex min-h-11 items-center rounded-full border-2 border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition data-[hovered=true]:border-[var(--accent)] data-[selected=true]:border-[var(--accent)] data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-white data-[focus-visible=true]:outline-3 data-[focus-visible=true]:outline-offset-2 data-[focus-visible=true]:outline-[var(--focus)]">
+                  {option.label}
+                </Radio.Content>
+              </Radio>
             ))}
           </div>
-        </fieldset>
+        </RadioGroup>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor={`komentar-${modul}`} className="text-sm font-semibold text-white">
-            3. Bagian apa yang paling membantu atau masih membingungkan? <span className="font-normal text-white/60">(opsional)</span>
-          </label>
-          <textarea
-            id={`komentar-${modul}`}
-            rows={3}
-            maxLength={500}
-            value={komentar}
-            onChange={(event) => setKomentar(event.target.value)}
-            placeholder="Tulis masukanmu di sini..."
-            className="w-full rounded-xl border border-white/20 bg-white/5 p-3 text-sm text-white placeholder:text-white/40"
-          />
-          <label className="flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-[var(--color-ink-on-bg-muted)]">
-            <input
-              type="checkbox"
-              checked={laporanKonten}
-              onChange={(event) => setLaporanKonten(event.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-[var(--color-ochre)]"
-            />
+        <TextField value={komentar} onChange={setKomentar} maxLength={500} className="flex flex-col gap-2">
+          <Label className="text-sm font-semibold text-slate-900">
+            3. Bagian apa yang paling membantu atau masih membingungkan?{' '}
+            <span className="font-normal text-slate-500">(opsional)</span>
+          </Label>
+          <TextArea rows={3} placeholder="Tulis masukanmu di sini..." className="w-full text-[15px]" />
+          <Description className="text-xs text-slate-500">{komentar.length}/500 karakter</Description>
+        </TextField>
+
+        <Checkbox isSelected={laporanKonten} onChange={setLaporanKonten}>
+          <Checkbox.Content className="items-start gap-2.5 text-sm leading-relaxed text-slate-600">
+            <Checkbox.Control className="mt-0.5">
+              <Checkbox.Indicator />
+            </Checkbox.Control>
             Laporkan informasi yang kurang tepat agar dapat kami tinjau.
-          </label>
-        </div>
+          </Checkbox.Content>
+        </Checkbox>
 
-        <button type="submit" className="btn-primary w-fit self-end !px-5 !py-2.5 !text-xs" disabled={!canSubmit}>
+        <Button type="submit" variant="primary" className="btn-cta w-full sm:w-fit sm:self-end" isDisabled={!canSubmit}>
           Kirim masukan
           <Send size={14} aria-hidden="true" />
-        </button>
-      </form>
-    </section>
+        </Button>
+      </Form>
+    </Card>
   )
 }
 

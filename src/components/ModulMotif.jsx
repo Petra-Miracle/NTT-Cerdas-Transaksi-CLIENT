@@ -5,7 +5,7 @@ function ModulMotif({ kind }) {
   if (kind === 'kalkulator') {
     return (
       <svg
-        className="pointer-events-none absolute -right-8 -bottom-8 h-52 w-52 opacity-30"
+        className="pointer-events-none absolute -right-8 -bottom-8 h-40 w-40 opacity-25 sm:h-52 sm:w-52 sm:opacity-30"
         viewBox="0 0 200 200"
         aria-hidden="true"
       >
@@ -34,7 +34,7 @@ function ModulMotif({ kind }) {
   if (kind === 'keamanan') {
     return (
       <svg
-        className="pointer-events-none absolute -right-8 -bottom-8 h-52 w-52 opacity-30"
+        className="pointer-events-none absolute -right-8 -bottom-8 h-40 w-40 opacity-25 sm:h-52 sm:w-52 sm:opacity-30"
         viewBox="0 0 200 200"
         aria-hidden="true"
       >
@@ -60,7 +60,7 @@ function ModulMotif({ kind }) {
     ]
     return (
       <svg
-        className="pointer-events-none absolute -right-6 -bottom-10 h-56 w-56 opacity-90"
+        className="pointer-events-none absolute -right-6 -bottom-10 h-44 w-44 opacity-90 sm:h-56 sm:w-56"
         viewBox="0 0 200 200"
         aria-hidden="true"
       >
@@ -79,7 +79,7 @@ function ModulMotif({ kind }) {
   // produklokal — anyaman tenun
   return (
     <svg
-      className="pointer-events-none absolute -right-8 -bottom-8 h-52 w-52 opacity-30"
+      className="pointer-events-none absolute -right-8 -bottom-8 h-40 w-40 opacity-25 sm:h-52 sm:w-52 sm:opacity-30"
       viewBox="0 0 200 200"
       aria-hidden="true"
     >

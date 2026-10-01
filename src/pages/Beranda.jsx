@@ -1,13 +1,12 @@
+import { Chip, Label, Link as HeroLink, SearchField } from '@heroui/react'
 import {
   ArrowRight,
   BookOpenCheck,
   Calculator,
   Play,
   QrCode,
-  Search,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -18,6 +17,7 @@ import ModulMotif from '../components/ModulMotif'
 import ProductTour from '../components/ProductTour'
 import Reveal from '../components/Reveal'
 import VideoBelajar from '../components/VideoBelajar'
+import { VIDEO_BELAJAR, videoWatch } from '../data/videoBelajar'
 import { useAmbientSound } from '../hooks/useAmbientSound'
 import { useProductTour } from '../hooks/useProductTour'
 
@@ -135,13 +135,48 @@ const LAUNCH_MODULES = {
   },
 }
 
+function normalizeSearchText(value) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
 function Beranda({ onOpenKuis: onOpenKuisProp }) {
   const [pendingLaunch, setPendingLaunch] = useState(null) // kalkulator | keamanan | kuis | produklokal
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
   const [ambientOn, setAmbientOn] = useAmbientSound(0.4)
   const tour = useProductTour('beranda', BERANDA_TOUR_STEPS.length)
   const navigate = useNavigate()
   // Jalur normal: App mengoper navigate('/kuis'). Fallback render mandiri.
   const openKuis = onOpenKuisProp ?? (() => navigate('/kuis'))
+  const searchTokens = normalizeSearchText(searchQuery).trim().split(/\s+/).filter(Boolean)
+  const searchMatches = searchTokens.length
+    ? [
+        ...QUICK_TOOLS.map((module) => ({
+          id: module.tourId,
+          type: 'module',
+          title: module.title,
+          detail: module.desc,
+          category: 'Modul belajar',
+          launchId: module.tourId.replace('module-', ''),
+          Icon: module.Icon,
+          searchText: `${module.title} ${module.desc} ${module.badge} ${module.cta}`,
+        })),
+        ...VIDEO_BELAJAR.flatMap((category) =>
+          category.videos.map((video) => ({
+            id: video.yt,
+            type: 'video',
+            title: video.title,
+            detail: video.channel,
+            category: category.label,
+            href: videoWatch(video.yt),
+            searchText: `${video.title} ${video.channel} ${category.label}`,
+          })),
+        ),
+      ].filter((item) => {
+        const searchableText = normalizeSearchText(item.searchText)
+        return searchTokens.every((token) => searchableText.includes(token))
+      })
+    : []
 
   const openLaunch = (e, id) => {
     e?.preventDefault()
@@ -162,37 +197,117 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
   return (
     <main className="bg-white text-slate-900">
       {/* Search strip */}
-      <div className="border-b border-slate-100 bg-white">
+      <div className="bg-white">
         <div className="mx-auto flex max-w-[1280px] flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="text-[15px] font-bold text-slate-900">
             Mau belajar apa hari ini?
           </p>
-          <div className="flex w-full max-w-md items-center gap-2">
-            <label className="flex flex-1 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 shadow-sm">
-              <Search size={16} className="text-slate-400" aria-hidden="true" />
-              <input
-                type="search"
-                placeholder="Cari: QRIS, 3D, tenun, kopi..."
-                className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    document.getElementById('modul')?.scrollIntoView({ behavior: 'smooth' })
-                  }
+          <div className="relative z-30 w-full max-w-md">
+            <div className="flex items-center gap-2">
+              <SearchField
+                aria-label="Cari modul belajar"
+                className="min-w-0 flex-1"
+                value={searchQuery}
+                onChange={(value) => {
+                  setSearchQuery(value)
+                  setSearchOpen(Boolean(value.trim()))
                 }}
-              />
-            </label>
-            <a
-              href="#modul"
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold whitespace-nowrap text-white shadow hover:bg-emerald-700"
-            >
-              Cari Modul
-            </a>
+                onSubmit={() => setSearchOpen(true)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') setSearchOpen(false)
+                }}
+              >
+                <Label className="sr-only">Cari modul belajar</Label>
+                <SearchField.Group className="h-11 rounded-xl border border-slate-300 bg-white shadow-sm">
+                  <SearchField.SearchIcon className="text-slate-400" />
+                  <SearchField.Input
+                    placeholder="Cari: QRIS, 3D, tenun, kopi..."
+                    className="min-w-0 text-[15px]"
+                    onFocus={() => searchQuery.trim() && setSearchOpen(true)}
+                  />
+                  <SearchField.ClearButton className="size-11 !bg-transparent !shadow-none hover:!bg-transparent" />
+                </SearchField.Group>
+              </SearchField>
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="h-11 shrink-0 rounded-xl bg-emerald-600 px-4 font-bold text-white shadow hover:bg-emerald-700"
+              >
+                Cari Modul
+              </button>
+            </div>
+
+            {searchOpen && searchQuery.trim() && (
+              <div
+                role="region"
+                aria-label={`Hasil pencarian untuk ${searchQuery}`}
+                aria-live="polite"
+                className="absolute top-full right-0 left-0 mt-2 max-h-[420px] overflow-y-auto rounded-xl bg-white p-2 shadow-xl ring-1 ring-slate-200"
+              >
+                <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-500">
+                  <span>Hasil pencarian</span>
+                  <span>{searchMatches.length} hasil</span>
+                </div>
+                {searchMatches.length ? (
+                  searchMatches.slice(0, 8).map((result) => {
+                    const ResultIcon = result.Icon ?? Play
+                    const resultContent = (
+                      <>
+                        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[#15335F]">
+                          <ResultIcon size={17} aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0 flex-1 text-left">
+                          <span className="block text-[10px] font-bold uppercase text-slate-500">
+                            {result.type === 'module' ? result.category : `Video • ${result.category}`}
+                          </span>
+                          <span className="block truncate text-sm font-bold text-slate-900">{result.title}</span>
+                          <span className="block truncate text-xs text-slate-500">{result.detail}</span>
+                        </span>
+                        <ArrowRight size={15} className="shrink-0 text-slate-400" aria-hidden="true" />
+                      </>
+                    )
+
+                    if (result.type === 'module') {
+                      return (
+                        <button
+                          key={result.id}
+                          type="button"
+                          onClick={() => {
+                            setSearchOpen(false)
+                            setPendingLaunch(result.launchId)
+                          }}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-slate-50"
+                        >
+                          {resultContent}
+                        </button>
+                      )
+                    }
+
+                    return (
+                      <a
+                        key={result.id}
+                        href={result.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-slate-50"
+                      >
+                        {resultContent}
+                      </a>
+                    )
+                  })
+                ) : (
+                  <p className="px-3 py-5 text-center text-sm text-slate-500">
+                    Tidak ada konten yang cocok dengan “{searchQuery}”.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative min-h-[calc(100svh-8.5rem)] overflow-hidden bg-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.5]"
           style={{
@@ -201,22 +316,18 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
           }}
           aria-hidden="true"
         />
-        <div className="relative mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-10 px-4 py-10 sm:px-6 lg:grid-cols-2 lg:py-14">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#15335F] px-3.5 py-1.5 text-[11px] font-bold tracking-wide text-white uppercase">
-              <Sparkles size={13} aria-hidden="true" />
-              Program Edukasi Transaksi Digital NTT • BI Kupang
-            </div>
-            <h1 className="mt-4 text-4xl leading-[1.05] font-black tracking-tight text-[#15335F] sm:text-5xl lg:text-[56px]">
+        <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-2 lg:gap-10 lg:py-14">
+          <div className="text-center lg:text-left">
+            <h1 className="mt-4 text-3xl leading-[1.08] font-black tracking-tight text-[#15335F] sm:text-4xl lg:text-[56px] xl:text-[64px]">
               Belajar QRIS
               <br />
               untuk UMKM Kupang
             </h1>
-            <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-slate-600">
+            <p className="mx-auto mt-4 max-w-[600px] text-[15px] leading-relaxed text-slate-600 sm:text-[16px] lg:mx-0">
               Hitung penghematan QRIS, waspada penipuan, kuis Cinta Bangga Paham Rupiah, dan tebak produk
               lokal NTT. Empat mode interaktif untuk pedagang UMKM Kupang.
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link
                 to="/kalkulator"
                 onClick={(e) => openLaunch(e, 'kalkulator')}
@@ -236,26 +347,21 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
           </div>
 
           {/* Visual kanan */}
-          <div className="relative mx-auto flex w-full max-w-[520px] items-center justify-center">
-            <div className="absolute h-[380px] w-[380px] rounded-full bg-[#FFD02F]/60 blur-0" aria-hidden="true" />
-            <div
-              className="absolute h-[420px] w-[420px] rounded-[48px] rotate-6 bg-[#15335F]"
-              aria-hidden="true"
-            />
+          <div className="relative mx-auto flex w-full max-w-[400px] items-center justify-center sm:max-w-[520px] xl:max-w-[620px]">
             <img
               src={maskotKora}
               alt="Maskot KoRa, Duta Rupiah Flobamora"
-              className="mascot-float relative z-10 h-[340px] w-auto object-contain drop-shadow-2xl sm:h-[380px]"
+              className="mascot-float relative z-10 h-[260px] w-auto object-contain drop-shadow-2xl sm:h-[340px] lg:h-[380px] xl:h-[460px]"
             />
-            <div className="absolute top-6 -left-1 z-20 rotate-[-6deg] rounded-xl bg-white px-3.5 py-2.5 shadow-xl ring-1 ring-slate-200 sm:left-2">
-              <p className="flex items-center gap-1.5 text-[12px] font-black text-[#15335F]">
-                <QrCode size={15} aria-hidden="true" /> QRIS = Hemat Waktu!
+            <div className="absolute top-4 left-0 z-20 rotate-[-6deg] rounded-xl bg-white px-3 py-2 shadow-xl ring-1 ring-slate-200 sm:top-6 sm:left-2 sm:px-3.5 sm:py-2.5">
+              <p className="flex items-center gap-1.5 text-[11px] font-black text-[#15335F] sm:text-[12px]">
+                <QrCode size={14} aria-hidden="true" /> QRIS = Hemat Waktu!
               </p>
-              <p className="text-[11px] font-medium text-slate-500">Rp15.000 / jam terhemat</p>
+              <p className="text-[10px] font-medium text-slate-500 sm:text-[11px]">Rp15.000 / jam terhemat</p>
             </div>
-            <div className="absolute right-0 bottom-8 z-20 rotate-[5deg] rounded-xl bg-[#E8590C] px-3.5 py-2.5 shadow-xl sm:right-2">
-              <p className="text-[12px] font-black text-white">Cek 3D: Dilihat!</p>
-              <p className="text-[11px] font-medium text-white/85">Diraba • Diterawang</p>
+            <div className="absolute right-0 bottom-6 z-20 rotate-[5deg] rounded-xl bg-[#E8590C] px-3 py-2 shadow-xl sm:bottom-8 sm:right-2 sm:px-3.5 sm:py-2.5">
+              <p className="text-[11px] font-black text-white sm:text-[12px]">Cek 3D: Dilihat!</p>
+              <p className="text-[10px] font-medium text-white/85 sm:text-[11px]">Diraba • Diterawang</p>
             </div>
           </div>
         </div>
@@ -286,19 +392,20 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
                   <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${m.soft} ring-1 ring-white/40`}>
                     <m.Icon size={24} className="text-white" aria-hidden="true" />
                   </span>
-                  <span className="rounded-md bg-black/25 px-2 py-1 text-[11px] font-bold text-white">
+                  <Chip size="sm" className="bg-black/25 font-bold text-white">
                     ⚡ {m.badge}
-                  </span>
+                  </Chip>
                 </div>
                 <p className="mt-4 text-[17px] leading-snug font-extrabold text-white">{m.title}</p>
-                <p className="mt-1 text-[13px] leading-relaxed text-white/85">{m.desc}</p>
-                <span className="mt-5 inline-flex w-fit rounded-lg bg-white px-4 py-2 text-[13px] font-bold text-slate-900 shadow">
+                <p className="mt-1 max-w-[34ch] text-sm leading-relaxed text-white/90">{m.desc}</p>
+                <span className="mt-5 inline-flex min-h-[40px] w-fit items-center gap-1.5 rounded-xl bg-white px-4 text-sm font-bold text-slate-900 shadow transition group-hover:gap-2.5">
                   {m.cta}
+                  <ArrowRight size={15} aria-hidden="true" />
                 </span>
               </div>
             )
 
-            const cls = `relative flex flex-col overflow-hidden rounded-2xl ${m.bg} p-5 shadow-md transition hover:-translate-y-1 hover:shadow-xl`
+            const cls = `group relative flex flex-col overflow-hidden rounded-2xl ${m.bg} p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:scale-[0.99]`
 
             if (m.to) {
               return (
@@ -331,7 +438,7 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
         <button
           type="button"
           onClick={tour.restart}
-          className="mt-3 text-[12px] font-semibold text-slate-500 underline-offset-2 hover:text-[#15335F] hover:underline"
+          className="mt-3 inline-flex min-h-[44px] items-center text-[12px] font-semibold text-slate-500 underline-offset-2 hover:text-[#15335F] hover:underline"
         >
           Lihat panduan lagi
         </button>
@@ -410,7 +517,7 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
       {/* Slogan penutup khas Kupang */}
       <section className="mx-auto max-w-[1280px] px-4 pb-14 sm:px-6">
         <div
-          className="relative overflow-hidden rounded-[32px] bg-[#0B1E3A] px-6 py-12 text-center shadow-2xl sm:px-12 sm:py-16"
+          className="relative overflow-hidden rounded-[24px] bg-[#0B1E3A] px-5 py-10 text-center shadow-2xl sm:rounded-[32px] sm:px-12 sm:py-16"
         >
           <div
             className="pointer-events-none absolute inset-0 opacity-40"
@@ -426,40 +533,49 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
             style={{ background: 'radial-gradient(closest-side, #E8590C, transparent)' }}
             aria-hidden="true"
           />
-          <p className="relative text-[11px] font-black tracking-[0.3em] text-[#FFD02F] uppercase">
+          <p className="relative text-[10px] font-black tracking-[0.3em] text-[#FFD02F] uppercase sm:text-[11px]">
             Beta kasih tau ee
           </p>
-          <p className="relative mx-auto mt-4 max-w-[900px] font-display text-5xl leading-[1.02] font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
+          <p className="relative mx-auto mt-4 max-w-[900px] font-display text-3xl leading-[1.05] font-black tracking-tight text-white sm:text-5xl lg:text-7xl">
             Lu{' '}
-            <span className="inline-block -rotate-2 rounded-xl bg-[#FFD02F] px-3 py-1 text-[#0B1E3A] shadow-lg sm:px-4">
+            <span className="inline-block -rotate-2 rounded-lg bg-[#FFD02F] px-2 py-0.5 text-[#0B1E3A] shadow-lg sm:rounded-xl sm:px-4 sm:py-1">
               sonde keren
             </span>
             <br />
             kalau belum pakai{' '}
             <span className="text-[#FFD02F]">QRIS!</span>
           </p>
-          <p className="relative mx-auto mt-5 max-w-[520px] text-[15px] leading-relaxed text-white/70">
+          <p className="relative mx-auto mt-5 max-w-[520px] text-[14px] leading-relaxed text-white/70 sm:text-[15px]">
             Hitung hematmu, kenali jebakannya, menangkan kuisnya — mulai dari Kalkulator QRIS.
           </p>
           <div className="relative mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               to="/kalkulator"
               onClick={(e) => openLaunch(e, 'kalkulator')}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8590C] px-8 py-3.5 text-[15px] font-black text-white shadow-xl shadow-orange-900/40 transition hover:-translate-y-0.5 hover:bg-[#C94F08]"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E8590C] px-7 py-3 text-sm font-black text-white shadow-xl shadow-orange-900/40 transition hover:-translate-y-0.5 hover:bg-[#C94F08] sm:px-8 sm:py-3.5 sm:text-[15px]"
             >
               Buktikan Sekarang
-              <ArrowRight size={17} aria-hidden="true" />
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <a
               href="#modul"
-              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/25 px-8 py-3.5 text-[15px] font-bold text-white transition hover:border-white/60 hover:bg-white/10"
+              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/25 px-7 py-3 text-sm font-bold text-white transition hover:border-white/60 hover:bg-white/10 sm:px-8 sm:py-3.5 sm:text-[15px]"
             >
               Pilih Modul Dulu
             </a>
           </div>
         </div>
-        <p className="mt-6 text-center text-[12px] font-medium text-slate-400">
-          Info QRIS resmi: bi.go.id/QRIS • Pengaduan: BI 131 / OJK 157
+        <p className="mt-6 text-center text-[13px] font-medium text-slate-500">
+          Info QRIS resmi:{' '}
+          <HeroLink
+            href="https://www.bi.go.id/QRIS"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[#15335F] underline-offset-2"
+          >
+            bi.go.id/QRIS
+          </HeroLink>{' '}
+          • Pengaduan: BI 131 / OJK 157
         </p>
       </section>
 

@@ -1,5 +1,51 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+/* HeroUI v3 — hanya CSS komponen yang benar-benar dipakai (bukan seluruh
+   ~80 komponen lewat "@heroui/react/styles"), urutan mengikuti
+   @heroui/styles/dist/components/index.css karena urutan memengaruhi
+   spesifisitas. Tambah baris di sini bila memakai komponen HeroUI baru. */
+@import "tw-animate-css";
+@import "@heroui/styles/base" layer(base);
+@import "@heroui/styles/base/scrollbar.css" layer(base);
+@import "@heroui/styles/components/close-button.css" layer(components);
+@import "@heroui/styles/components/description.css" layer(components);
+@import "@heroui/styles/components/field-error.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/accordion.css" layer(components);
+@import "@heroui/styles/components/breadcrumbs.css" layer(components);
+@import "@heroui/styles/components/disclosure.css" layer(components);
+@import "@heroui/styles/components/link.css" layer(components);
+@import "@heroui/styles/components/tabs.css" layer(components);
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/toggle-button.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/alert.css" layer(components);
+@import "@heroui/styles/components/empty-state.css" layer(components);
+@import "@heroui/styles/components/skeleton.css" layer(components);
+@import "@heroui/styles/components/progress-bar.css" layer(components);
+@import "@heroui/styles/components/progress-circle.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/checkbox-group.css" layer(components);
+@import "@heroui/styles/components/checkbox.css" layer(components);
+@import "@heroui/styles/components/fieldset.css" layer(components);
+@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/input-group.css" layer(components);
+@import "@heroui/styles/components/radio-group.css" layer(components);
+@import "@heroui/styles/components/radio.css" layer(components);
+@import "@heroui/styles/components/textfield.css" layer(components);
+@import "@heroui/styles/components/search-field.css" layer(components);
+@import "@heroui/styles/components/textarea.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/surface.css" layer(components);
+@import "@heroui/styles/components/avatar.css" layer(components);
+@import "@heroui/styles/components/drawer.css" layer(components);
+@import "@heroui/styles/components/tooltip.css" layer(components);
+@import "@heroui/styles/components/kbd.css" layer(components);
+@import "@heroui/styles/components/scroll-shadow.css" layer(components);
+@import "@heroui/styles/themes/default" layer(theme);
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";
 
 @theme {
   --font-display: "Space Grotesk", sans-serif;
@@ -41,6 +87,52 @@
   --radius-panel-sm: 22px;
 }
 
+/* ==========================================================================
+   Tema HeroUI v3 — disesuaikan dengan identitas NTT Cerdas Transaksi.
+   --accent default = navy brand; tiap halaman modul menimpa --accent lewat
+   kelas .accent-* sehingga Button/Radio/Checkbox/ProgressBar/dll otomatis
+   berwarna sesuai modul. Variabel turunan (hover/soft/focus) dideklarasikan
+   ulang di tiap scope karena var() dihitung di elemen tempat ia dideklarasi.
+   ========================================================================== */
+:root,
+[data-theme="light"] {
+  --accent: #15335f;
+  --accent-foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --danger: #e5484d;
+  --danger-foreground: #ffffff;
+  --warning: #ffd02f;
+  --warning-foreground: #15335f;
+  --border: #e2e8f0;
+  --separator: #e2e8f0;
+  --radius: 0.75rem;
+  --tooltip-delay: 300ms;
+}
+
+:root,
+[data-theme="light"],
+.accent-navy,
+.accent-oranye,
+.accent-ungu,
+.accent-mawar,
+.accent-biru {
+  --accent-hover: color-mix(in oklab, var(--accent) 86%, black 14%);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, white);
+  --accent-soft-hover: color-mix(in oklab, var(--accent) 18%, white);
+  --accent-soft-foreground: color-mix(in oklab, var(--accent) 80%, black 20%);
+  --focus: var(--accent);
+}
+
+.accent-navy { --accent: #15335f; }
+.accent-oranye { --accent: #e8590c; }
+.accent-ungu { --accent: #7c5cff; }
+.accent-mawar { --accent: #e11d48; }
+.accent-biru { --accent: #1a5dad; }
+
 @layer base {
   body {
     background-color: var(--color-bg);
@@ -55,9 +147,15 @@
     font-family: var(--font-display);
   }
 
+  /* Semua halaman kini bertema terang: cincin fokus navy (kontras tinggi di
+     atas putih); area gelap memakai kelas .focus-on-dark (kuning). */
   :focus-visible {
-    outline: 2px solid var(--color-ochre);
+    outline: 3px solid #15335f;
     outline-offset: 2px;
+  }
+
+  .focus-on-dark :focus-visible {
+    outline-color: #ffd02f;
   }
 }
 
@@ -166,36 +264,11 @@
     @apply flex shrink-0 items-center justify-center rounded-xl border;
   }
 
-  /* Kalkulator (terang, putih-oranye): kartu opsi terang + indikator oranye. */
+  /* Kartu opsi terang (HeroUI Radio/Checkbox.Content): warna mengikuti
+     --accent modul, state dari atribut data-* React Aria. */
   .option-card-light {
-    @apply relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border-2 border-orange-200 bg-white px-5 py-[18px] text-left text-sm font-medium text-slate-800 shadow-sm transition;
-  }
-
-  .option-card-light:hover {
-    @apply border-orange-300 bg-orange-50;
-  }
-
-  .option-card-light[data-selected="true"] {
-    border-color: #e8590c;
-    background: #fff7ed;
-    box-shadow: 0 10px 22px -10px rgb(232 89 12 / 0.4);
-  }
-
-  .option-indicator-light {
-    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-orange-300 bg-white;
-  }
-
-  .option-indicator-light[data-shape="square"] {
-    @apply rounded-md;
-  }
-
-  .option-indicator-light[data-checked="true"] {
-    border-color: #e8590c;
-  }
-
-  .option-dot-light {
-    @apply h-2.5 w-2.5 rounded-full;
-    background: #e8590c;
+    @apply relative flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border-2 bg-white px-5 py-[18px] text-left font-medium text-slate-800 shadow-sm transition;
+    border-color: color-mix(in oklab, var(--accent) 25%, white);
   }
 
   /* Kartu jawaban terang (ungu, modul Keamanan): tint tegas agar terbaca. */
@@ -219,7 +292,7 @@
     box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
   }
 
-  .answer-card-light[data-disabled="true"] {
+  .answer-card-light[data-dimmed="true"] {
     @apply pointer-events-none opacity-45;
   }
 
@@ -248,7 +321,7 @@
     box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
   }
 
-  .answer-card-rose[data-disabled="true"] {
+  .answer-card-rose[data-dimmed="true"] {
     @apply pointer-events-none opacity-45;
   }
 
@@ -277,7 +350,7 @@
     box-shadow: 0 10px 22px -10px rgb(239 68 68 / 0.4);
   }
 
-  .answer-card-biru[data-disabled="true"] {
+  .answer-card-biru[data-dimmed="true"] {
     @apply pointer-events-none opacity-45;
   }
 
@@ -404,7 +477,7 @@
     background: rgb(255 107 107 / 10%);
   }
 
-  .answer-card[data-disabled="true"] {
+  .answer-card[data-dimmed="true"] {
     @apply pointer-events-none opacity-45;
   }
 
@@ -512,13 +585,13 @@
     animation: fade-scale-in 0.3s ease-out both;
   }
 
-  /* Product tour: dark backdrop with a "cutout" spotlight box positioned
-     over the current step's target element, plus a small floating card. */
+  /* Product tour: backdrop with a "cutout" spotlight box positioned over
+     the current step's target element, plus a small floating card. */
   .tour-spotlight {
     position: fixed;
     border-radius: 16px;
-    box-shadow: 0 0 0 9999px rgb(5 7 16 / 75%);
-    outline: 2px solid var(--color-ochre);
+    box-shadow: 0 0 0 9999px rgb(11 30 58 / 55%);
+    outline: 3px solid #ffd02f;
     outline-offset: 2px;
     pointer-events: none;
     transition:
@@ -533,9 +606,9 @@
     z-index: 1;
     width: min(320px, calc(100vw - 32px));
     border-radius: var(--radius-panel-sm);
-    border: 1px solid rgb(255 255 255 / 12%);
-    background: linear-gradient(180deg, #1c2a44, #101a2e);
-    box-shadow: 0 20px 45px -15px rgb(5 7 16 / 60%);
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 20px 45px -15px rgb(15 23 42 / 25%);
     padding: 18px 20px;
   }
 
@@ -592,17 +665,6 @@
 
   50% {
     transform: translateY(-14px) rotate(1.5deg);
-  }
-}
-
-@keyframes coin-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(var(--coin-rotate, -8deg));
-  }
-
-  50% {
-    transform: translateY(-10px) rotate(calc(var(--coin-rotate, -8deg) * -1));
   }
 }
 
@@ -770,6 +832,81 @@
 @keyframes card-glow {
   0% { box-shadow: 0 0 0 0 rgb(5 150 105 / 0.55); }
   100% { box-shadow: 0 0 0 20px transparent; }
+}
+
+/* Preset tombol aksi HeroUI: tinggi ramah jempol (≥48px) di semua layar
+   (bawaan HeroUI mengecil ke 40px di md:), teks tebal, boleh membungkus. */
+@layer components {
+  .button.btn-cta {
+    height: auto;
+    min-height: 48px;
+    padding-inline: 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    white-space: normal;
+  }
+
+  /* Panah geser baris tab (Tabs.ListContainer) — bawaan 16px terlalu kecil
+     untuk jari; jadikan tombol bulat 36px berlatar putih. */
+  .tabs__list-container > .tabs__list-container__scroll-prev,
+  .tabs__list-container > .tabs__list-container__scroll-next {
+    width: 2.25rem;
+    height: 2.25rem;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgb(15 23 42 / 18%);
+  }
+
+  /* Varian sekunder bertema modul: garis tepi tint --accent, latar putih. */
+  .button.btn-accent-outline {
+    --button-bg: #ffffff;
+    --button-bg-hover: var(--accent-soft);
+    --button-bg-pressed: var(--accent-soft-hover);
+    --button-fg: var(--accent-soft-foreground);
+    border: 2px solid color-mix(in oklab, var(--accent) 30%, white);
+  }
+}
+
+/* Kartu jawaban & opsi (semua modul terang): teks lebih besar, tinggi
+   minimal ramah jempol, dan umpan balik saat ditekan. */
+@layer components {
+  .option-card-light,
+  .answer-card-light,
+  .answer-card-rose,
+  .answer-card-biru {
+    min-height: 56px;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .answer-card-light.button,
+  .answer-card-rose.button,
+  .answer-card-biru.button {
+    height: auto;
+    justify-content: flex-start;
+    white-space: normal;
+  }
+
+  /* Tombol jawaban dinonaktifkan setelah menjawab — jangan ikut redup
+     bawaan HeroUI; hanya opsi yang tidak dipilih (data-dimmed) yang redup. */
+  .answer-card-light:disabled:not([data-dimmed]),
+  .answer-card-rose:disabled:not([data-dimmed]),
+  .answer-card-biru:disabled:not([data-dimmed]) {
+    opacity: 1;
+  }
+
+  .option-card-light:active,
+  .answer-card-light:active:not(:disabled),
+  .answer-card-rose:active:not(:disabled),
+  .answer-card-biru:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+
+  .option-card-light:has(input:focus-visible) {
+    outline: 3px solid #15335f;
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

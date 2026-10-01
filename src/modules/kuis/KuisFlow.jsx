@@ -1,9 +1,11 @@
-import { ArrowRight, Check, ChevronDown, CircleCheck, CircleX, Repeat2, Star, X } from 'lucide-react'
+import { Button, Chip, ProgressCircle } from '@heroui/react'
+import { Repeat2, Star } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import AnswerCard from '../../components/AnswerCard'
-import KoraNote from '../../components/KoraNote'
+import AnswerFeedback from '../../components/AnswerFeedback'
 import ProductTour from '../../components/ProductTour'
 import ProgressDots from '../../components/ProgressDots'
+import ReviewDisclosure from '../../components/ReviewDisclosure'
 import { useProductTour } from '../../hooks/useProductTour'
 import { submitKuisAttempt } from '../../services/api'
 import { playKoraSound } from '../../utils/koraSound'
@@ -36,27 +38,22 @@ function createInitialState() {
   return { index: 0, selected: null, correctCount: 0 }
 }
 
+// Cincin skor — HeroUI ProgressCircle (role="progressbar") yang diperbesar
+// dan diwarnai sesuai modul, dengan persentase di tengah.
 function ScoreRing({ percent }) {
-  const radius = 54
-  const circumference = 2 * Math.PI * radius
   return (
     <div className="relative h-[132px] w-[132px]">
-      <svg viewBox="0 0 132 132" className="h-full w-full -rotate-90">
-        <circle cx="66" cy="66" r={radius} fill="none" stroke="#FECDD3" strokeWidth="12" />
-        <circle
-          cx="66"
-          cy="66"
-          r={radius}
-          fill="none"
-          stroke="#E11D48"
-          strokeWidth="12"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - percent / 100)}
-          style={{ transition: 'stroke-dashoffset 1s ease-out' }}
-        />
-      </svg>
-      <p className="number-pop absolute inset-0 flex items-center justify-center text-3xl font-black text-slate-900">
+      <ProgressCircle
+        aria-label="Persentase pemahaman"
+        value={percent}
+        className="size-full [--progress-circle-track-stroke:#FECDD3] [&_.progress-circle__fill-circle]:[transition-duration:1s]"
+      >
+        <ProgressCircle.Track className="size-full">
+          <ProgressCircle.TrackCircle />
+          <ProgressCircle.FillCircle />
+        </ProgressCircle.Track>
+      </ProgressCircle>
+      <p aria-hidden="true" className="number-pop pointer-events-none absolute inset-0 flex items-center justify-center text-3xl font-black text-slate-900">
         {percent}%
       </p>
     </div>
@@ -67,7 +64,6 @@ function KuisFlow() {
   const [state, setState] = useState(createInitialState)
   const [selesai, setSelesai] = useState(false)
   const [review, setReview] = useState([])
-  const [showReview, setShowReview] = useState(false)
   const tour = useProductTour('kuis', TOUR_STEPS.length)
 
   const percent = Math.round((state.correctCount / TOTAL) * 100)
@@ -110,26 +106,26 @@ function KuisFlow() {
     setState(createInitialState())
     setSelesai(false)
     setReview([])
-    setShowReview(false)
   }
 
   const starCount = percent >= 80 ? 3 : percent >= 50 ? 2 : 1
 
   return (
     <div
-      className="relative mx-auto w-full max-w-[900px] rounded-[28px] border border-rose-100 bg-white/95 p-6 shadow-xl shadow-rose-200/50 backdrop-blur-sm sm:p-10"
+      className="relative mx-auto w-full max-w-[900px] rounded-[24px] border border-rose-100 bg-white/95 p-5 shadow-xl shadow-rose-200/50 backdrop-blur-sm sm:rounded-[28px] sm:p-8 lg:p-10"
       data-tour="kuis-panel"
     >
       <button
         type="button"
         onClick={tour.restart}
-        className="mb-5 inline-flex w-fit items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#E11D48]"
+        className="-mt-2 mb-2 ml-auto flex min-h-[44px] w-fit items-center gap-1.5 px-1 text-[13px] font-semibold text-slate-500 transition hover:text-[#E11D48]"
       >
         <Repeat2 size={13} aria-hidden="true" />
         Lihat panduan lagi
       </button>
       {selesai ? (
-        <div className="relative flex flex-col items-center gap-4 overflow-hidden text-center" data-testid="kuis-selesai">          {isVictory && (
+        <div className="relative flex flex-col items-center gap-4 overflow-hidden text-center" data-testid="kuis-selesai">
+          {isVictory && (
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
               {CONFETTI.map((piece, i) => (
                 <span
@@ -181,62 +177,35 @@ function KuisFlow() {
             ))}
           </div>
 
-          <p className="text-3xl font-black tracking-tight text-slate-900">
+          <p className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
             Skor: {state.correctCount}/{TOTAL} · {percent}% paham
           </p>
           <p className="max-w-sm text-slate-600">{getKuisMessage(percent)}</p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#E11D48] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/30 transition hover:bg-[#BE123C]"
-              onClick={handleRestart}
-            >
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Button variant="primary" className="btn-cta w-full shadow-lg shadow-rose-500/30 sm:w-auto" onPress={handleRestart}>
               ↻ Ulangi
-            </button>
+            </Button>
           </div>
 
-          <button
-            type="button"
-            aria-expanded={showReview}
-            onClick={() => setShowReview((prev) => !prev)}
-            className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#E11D48] hover:underline"
-          >
-            {showReview ? 'Sembunyikan pembahasan' : 'Lihat pembahasan tiap soal'}
-            <ChevronDown size={15} aria-hidden="true" className={`transition ${showReview ? 'rotate-180' : ''}`} />
-          </button>
-
-          {showReview && (
-            <div className="flex w-full flex-col gap-3 text-left">
-              {review.map((item, i) => {
-                const answered = KUIS_LIST[item.soalIndex]
-                return (
-                  <div key={i} className="flex items-start gap-2.5 rounded-2xl border border-rose-100 bg-white p-4">
-                    {item.benar ? (
-                      <Check size={16} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
-                    ) : (
-                      <X size={16} className="mt-0.5 shrink-0 text-red-500" aria-hidden="true" />
-                    )}
-                    <div>
-                      <p className="text-[13px] font-bold text-slate-900">
-                        Soal {item.soalIndex + 1}: {answered.soal}
-                      </p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-slate-600">{answered.penjelasan}</p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+          <ReviewDisclosure
+            labelOpen="Lihat pembahasan tiap soal"
+            items={review.map((item, i) => ({
+              key: i,
+              benar: item.benar,
+              title: `Soal ${item.soalIndex + 1}: ${KUIS_LIST[item.soalIndex].soal}`,
+              body: KUIS_LIST[item.soalIndex].penjelasan,
+            }))}
+          />
         </div>
       ) : (
-        <div className="flex flex-col gap-5" data-testid="kuis-content" data-tour="kuis-panel">
+        <div className="flex flex-col gap-4 sm:gap-5" data-testid="kuis-content" data-tour="kuis-panel">
           <ProgressDots total={TOTAL} current={state.index} accent="mawar" variant="flat" tone="light" />
 
-          <div className="flex flex-col gap-3">
-            <p className="text-xs font-black tracking-widest text-[#E11D48] uppercase">
+          <div className="flex flex-col gap-2 sm:gap-3">
+            <Chip color="accent" variant="soft" size="sm" className="w-fit font-black tracking-widest uppercase">
               Soal {state.index + 1} dari {TOTAL}
-            </p>
-            <p className="text-xl leading-snug font-extrabold text-slate-900">{soal.soal}</p>
+            </Chip>
+            <p className="text-lg leading-snug font-extrabold text-slate-900 sm:text-xl">{soal.soal}</p>
           </div>
 
           <div className="flex flex-col gap-2.5">
@@ -254,30 +223,14 @@ function KuisFlow() {
           </div>
 
           {isAnswered && (
-            <div className="fade-scale-in flex flex-col gap-3 rounded-2xl border border-rose-100 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2.5">
-                {opsi[state.selected].benar ? (
-                  <CircleCheck size={20} className="text-emerald-600" aria-hidden="true" />
-                ) : (
-                  <CircleX size={20} className="text-red-500" aria-hidden="true" />
-                )}
-                <p className={`text-base font-bold ${opsi[state.selected].benar ? 'text-emerald-700' : 'text-red-600'}`}>
-                  {opsi[state.selected].benar ? 'Tepat!' : 'Belum tepat'}
-                </p>
-              </div>
-              <p className="text-sm leading-relaxed text-slate-600">{soal.penjelasan}</p>
-              <KoraNote tone="light" outcome={opsi[state.selected].benar ? 'correct' : 'incorrect'}>
-                {opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}
-              </KoraNote>
-              <button
-                type="button"
-                className="inline-flex w-fit items-center justify-center gap-2 self-end rounded-full bg-[#E11D48] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-rose-500/30 transition hover:bg-[#BE123C]"
-                onClick={handleNext}
-              >
-                {state.index === TOTAL - 1 ? 'Lihat skor' : 'Soal Berikutnya'}
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
-            </div>
+            <AnswerFeedback
+              benar={opsi[state.selected].benar}
+              title={opsi[state.selected].benar ? 'Tepat!' : 'Belum tepat'}
+              text={soal.penjelasan}
+              koraMessage={opsi[state.selected].benar ? KORA_PESAN_BENAR : KORA_PESAN_SALAH}
+              nextLabel={state.index === TOTAL - 1 ? 'Lihat skor' : 'Soal Berikutnya'}
+              onNext={handleNext}
+            />
           )}
         </div>
       )}

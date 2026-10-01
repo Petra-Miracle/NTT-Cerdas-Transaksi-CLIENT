@@ -1,39 +1,37 @@
-import { Check } from 'lucide-react'
+import { Checkbox, Radio } from '@heroui/react'
 
-function OptionCard({ type = 'radio', name, value, checked, onChange, children, disabled, tone = 'dark' }) {
-  const isLight = tone === 'light'
+// Kartu opsi besar berbasis HeroUI Radio / Checkbox (React Aria): semantik
+// radio/checkbox asli, navigasi keyboard, dan state hover/pressed/focus
+// datang dari HeroUI — tampilan kartunya disesuaikan dengan tema modul lewat
+// --accent (lihat .accent-* di index.css). Dipakai di dalam
+// <RadioGroup> / <CheckboxGroup> milik HeroUI.
+const CARD =
+  'option-card-light group w-full data-[selected=true]:border-[var(--accent)] data-[selected=true]:bg-[var(--accent-soft)] data-[selected=true]:shadow-[0_10px_22px_-10px_color-mix(in_oklab,var(--accent)_45%,transparent)] data-[hovered=true]:border-[color-mix(in_oklab,var(--accent)_45%,white)] data-[focus-visible=true]:outline-3 data-[focus-visible=true]:outline-offset-2 data-[focus-visible=true]:outline-[var(--focus)]'
 
+const CONTROL = 'size-5 border-2 border-[color-mix(in_oklab,var(--accent)_40%,white)] bg-white shadow-none'
+
+export function RadioOption({ value, children, className = '' }) {
   return (
-    <label className={isLight ? 'option-card-light' : 'option-card'} data-selected={checked}>
-      <input
-        type={type}
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        disabled={disabled}
-        className="peer sr-only"
-      />
-      <span
-        className={
-          isLight
-            ? 'option-indicator-light peer-focus-visible:ring-2 peer-focus-visible:ring-[#E8590C] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white'
-            : 'option-indicator peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-ochre)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#0d0f1a]'
-        }
-        data-shape={type === 'checkbox' ? 'square' : 'circle'}
-        data-checked={checked}
-        aria-hidden="true"
-      >
-        {checked &&
-          (type === 'checkbox' ? (
-            <Check size={13} strokeWidth={3} className={isLight ? 'text-[#E8590C]' : 'text-[var(--color-indigo)]'} />
-          ) : (
-            <span className={isLight ? 'option-dot-light' : 'option-dot'} />
-          ))}
-      </span>
-      <span>{children}</span>
-    </label>
+    <Radio value={value} className="w-full">
+      <Radio.Content className={`${CARD} ${className}`}>
+        <Radio.Control className={CONTROL}>
+          <Radio.Indicator />
+        </Radio.Control>
+        <span className="min-w-0 flex-1">{children}</span>
+      </Radio.Content>
+    </Radio>
   )
 }
 
-export default OptionCard
+export function CheckboxOption({ value, children, className = '' }) {
+  return (
+    <Checkbox value={value} className="w-full">
+      <Checkbox.Content className={`${CARD} ${className}`}>
+        <Checkbox.Control className={`${CONTROL} rounded-md`}>
+          <Checkbox.Indicator />
+        </Checkbox.Control>
+        <span className="min-w-0 flex-1">{children}</span>
+      </Checkbox.Content>
+    </Checkbox>
+  )
+}

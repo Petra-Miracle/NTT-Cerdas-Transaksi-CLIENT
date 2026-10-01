@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -59,6 +59,21 @@ describe('Beranda product tour', () => {
     expect(screen.getByRole('link', { name: /Coba Skenario/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Mulai Kuis/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Mulai Tebak/i })).toBeInTheDocument()
+  })
+
+  it('menampilkan hasil modul dan video yang sesuai dengan kata kunci', async () => {
+    const user = userEvent.setup()
+    window.localStorage.setItem('ntt_tour_seen_beranda', 'true')
+    renderBeranda()
+
+    await user.type(screen.getByPlaceholderText('Cari: QRIS, 3D, tenun, kopi...'), 'tenun')
+
+    const results = screen.getByRole('region', { name: 'Hasil pencarian untuk tenun' })
+    expect(within(results).getByRole('button', { name: /Lokal atau Impor\?/ })).toBeInTheDocument()
+    expect(
+      within(results).getByRole('link', { name: /JOURNEY - Tenun Timur Indonesia/ }),
+    ).toHaveAttribute('href', 'https://www.youtube.com/watch?v=9QDtv6_BR0E')
+    expect(within(results).queryByText('Hitung hemat QRIS dari nol')).not.toBeInTheDocument()
   })
 
   it('membuka animasi peluncuran KoRa saat kartu modul diklik', async () => {

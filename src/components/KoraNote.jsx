@@ -55,9 +55,9 @@ function KoraNote({ children, outcome = 'neutral', tone = 'dark', className = ''
         key={outcome}
         src={maskotKora}
         alt="Maskot KoRa"
-        className={`h-12 w-12 shrink-0 object-contain ${config.mascotAnim}`}
+        className={`h-14 w-14 shrink-0 object-contain sm:h-12 sm:w-12 ${config.mascotAnim}`}
       />
-      <div className="flex flex-col gap-0.5">
+      <div className="flex min-w-0 flex-col gap-0.5">
         {config.label && (
           <p className={`flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase ${config.badge}`}>
             {Icon && <Icon size={14} aria-hidden="true" />}
