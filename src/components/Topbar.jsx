@@ -62,20 +62,19 @@ Navbar.MenuToggle = function NavbarMenuToggle({ isOpen, onClick }) {
   )
 }
 
-// Menu mobile: HeroUI Drawer dari bawah layar — mudah dijangkau ibu jari,
+// Menu mobile: HeroUI Drawer dari sisi kanan layar,
 // menutup konten dengan backdrop (bukan mendorongnya), bisa ditutup dengan
 // swipe/Escape/tap di luar, dan fokus terkunci di dalam selama terbuka.
 Navbar.Menu = function NavbarMenu({ isOpen, onOpenChange, children }) {
   return (
     <Drawer.Backdrop isOpen={isOpen} onOpenChange={onOpenChange} className="lg:hidden">
-      <Drawer.Content placement="bottom">
-        <Drawer.Dialog className="rounded-t-[28px] px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <Drawer.Handle />
+      <Drawer.Content placement="right">
+        <Drawer.Dialog className="flex h-dvh w-[min(85vw,22rem)] max-w-[85vw] flex-col overflow-y-auto rounded-l-[28px] px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <Drawer.CloseTrigger aria-label="Tutup menu" className="size-11" />
           <Drawer.Header className="px-2 pt-2 pb-1">
             <Drawer.Heading className="font-display text-lg font-black text-[#15335F]">Pilih modul belajar</Drawer.Heading>
           </Drawer.Header>
-          <Drawer.Body className="flex flex-col gap-1.5 px-0">{children}</Drawer.Body>
+          <Drawer.Body className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-0">{children}</Drawer.Body>
         </Drawer.Dialog>
       </Drawer.Content>
     </Drawer.Backdrop>
@@ -237,7 +236,7 @@ export default function Topbar({ onOpenKuis, transparentAtTop = false }) {
           </span>
           Lokal atau Impor?
         </Navbar.MenuItem>
-        <div className="mt-2 border-t border-slate-100 pt-3">
+        <div className="mt-auto shrink-0 border-t border-slate-100 pt-3">
           <Link
             to="/kalkulator"
             onClick={() => setMenuOpen(false)}

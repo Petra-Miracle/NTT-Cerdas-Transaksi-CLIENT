@@ -307,7 +307,7 @@ function Beranda({ onOpenKuis: onOpenKuisProp }) {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[calc(100svh-8.5rem)] overflow-hidden bg-white">
+      <section className="relative min-h-0 xl:landscape:min-h-[min(calc(100svh-8.5rem),40rem)] overflow-hidden bg-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.5]"
           style={{
